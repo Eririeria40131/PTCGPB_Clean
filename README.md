@@ -6,6 +6,10 @@
 - Adopted a design that better matches the game's interface  
 - Reduced the amount of information displayed on a single page to improve readability
 
+### Presentation
+
+![UI Preview](https://github.com/Eririeria40131/PTCGPB_Clean/raw/main/Asset/image.png)
+
 # **License Change Notice**
 The original intention of this project was not for it to be used for paid services even those disguised as 'donations.'
 
