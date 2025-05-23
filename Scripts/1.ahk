@@ -474,109 +474,178 @@ Loop {
 
 MidOfRun:
 
-if(!(!friendIDs && friendID = "" && accountOpenPacks >= maxAccountPackNum))
-    if(!beginnerMissionsDone && (deleteMethod = "13 Pack" || (injectMethod && !loadedAccount) || (deleteMethod = "Inject Missions" && loadedAccount))) {
-        
-        ; Check if user wants to skip missions for Inject Missions
-        skipMissionsForInjectMissions := false
-        if (deleteMethod = "Inject Missions" && loadedAccount) {
-            IniRead, skipMissions, %A_ScriptDir%\..\Settings.ini, UserSettings, skipMissionsInjectMissions, 0
-            if (skipMissions == 1) {
-                LogToFile("Skipping missions in Inject Missions mode (user setting)")
-                beginnerMissionsDone := 1
-                if(injectMethod && loadedAccount)
-                    setMetaData()
-                skipMissionsForInjectMissions := true
-            }
+; ===== MISSIONS LOGIC - FIXED FOR INJECT MISSIONS =====
+; Check if we should do missions (only if user hasn't disabled them)
+shouldDoMissions := false
+
+if (!beginnerMissionsDone) {
+    ; For regular delete methods, check pack limits
+    if (deleteMethod = "13 Pack") {
+        shouldDoMissions := (!friendIDs && friendID = "" && accountOpenPacks < maxAccountPackNum) || (friendIDs || friendID != "")
+    }
+    ; For inject methods, only do missions if not specifically disabled
+    else if (InStr(deleteMethod, "Inject")) {
+        ; Check if user wants to skip missions for injection methods
+        IniRead, skipMissionsForInject, %A_ScriptDir%\..\Settings.ini, UserSettings, skipMissionsInjectMissions, 0
+        if (skipMissionsForInject != 1) {
+            shouldDoMissions := true
+            LogToFile("Inject method detected - missions enabled by user, executing regardless of pack count (" . accountOpenPacks . ")")
+        } else {
+            LogToFile("Inject method detected - missions disabled by user setting")
         }
+    }
+    ; For other methods with friend support
+    else {
+        shouldDoMissions := (!friendIDs && friendID = "" && accountOpenPacks < maxAccountPackNum) || (friendIDs || friendID != "")
+    }
+}
+
+if (shouldDoMissions) {
+    ; Check if user wants to skip missions for Inject Missions
+    skipMissionsForInjectMissions := false
+    if (deleteMethod = "Inject Missions" && loadedAccount) {
+        IniRead, skipMissions, %A_ScriptDir%\..\Settings.ini, UserSettings, skipMissionsInjectMissions, 0
+        if (skipMissions == 1) {
+            LogToFile("Skipping missions in Inject Missions mode (user setting)")
+            beginnerMissionsDone := 1
+            if(injectMethod && loadedAccount)
+                setMetaData()
+            skipMissionsForInjectMissions := true
+        }
+    }
+    
+    ; Only do missions if not skipping
+    if (!skipMissionsForInjectMissions) {
+        LogToFile("Starting mission sequence - Current pack count: " . accountOpenPacks)
         
-        ; Only do missions if not skipping
-        if (!skipMissionsForInjectMissions) {
-            HomeAndMission()
-            if(beginnerMissionsDone)
-                Goto, EndOfRun
+        HomeAndMission()
+        if(beginnerMissionsDone)
+            Goto, EndOfRun
 
-            SelectPack("HGPack")
-            if(cantOpenMorePacks)
-                Goto, EndOfRun
-                
-            PackOpening() ;6
-            if(cantOpenMorePacks || (!friendIDs && friendID = "" && accountOpenPacks >= maxAccountPackNum))
-                Goto, EndOfRun
-                
-            HourglassOpening(true) ;7
-            if(cantOpenMorePacks || (!friendIDs && friendID = "" && accountOpenPacks >= maxAccountPackNum))
-                Goto, EndOfRun
-
-            HomeAndMission()
-            if(beginnerMissionsDone)
-                Goto, EndOfRun
-                
-            SelectPack("HGPack")
-            if(cantOpenMorePacks)
-                Goto, EndOfRun
-            PackOpening() ;8
-            if(cantOpenMorePacks || (!friendIDs && friendID = "" && accountOpenPacks >= maxAccountPackNum))
-                Goto, EndOfRun
-                
-            HourglassOpening(true) ;9
-            if(cantOpenMorePacks || (!friendIDs && friendID = "" && accountOpenPacks >= maxAccountPackNum))
-                Goto, EndOfRun
-
-            HomeAndMission()
-            if(beginnerMissionsDone)
-                Goto, EndOfRun
-                
-            SelectPack("HGPack")
-            if(cantOpenMorePacks)
-                Goto, EndOfRun
-            PackOpening() ;10
-            if(cantOpenMorePacks || (!friendIDs && friendID = "" && accountOpenPacks >= maxAccountPackNum))
-                Goto, EndOfRun
-                
-            HourglassOpening(true) ;11
-            if(cantOpenMorePacks || (!friendIDs && friendID = "" && accountOpenPacks >= maxAccountPackNum))
-                Goto, EndOfRun
+        SelectPack("HGPack")
+        if(cantOpenMorePacks)
+            Goto, EndOfRun
             
-            ; Continue with the extended Inject Missions mission flow
-            if(injectMethod && loadedAccount && deleteMethod = "Inject Missions" ){			
-                HomeAndMission()
-                if(beginnerMissionsDone)
-                    Goto, EndOfRun
-                    
-                SelectPack("HGPack")
-                if(cantOpenMorePacks)
-                    Goto, EndOfRun
-                PackOpening() ;12
-                if(cantOpenMorePacks || (!friendIDs && friendID = "" && accountOpenPacks >= maxAccountPackNum))
-                    Goto, EndOfRun
-                
-                HourglassOpening(true) ;13
-                if(cantOpenMorePacks || (!friendIDs && friendID = "" && accountOpenPacks >= maxAccountPackNum))
-                    Goto, EndOfRun
-            }
+        PackOpening() ;6
+        if(cantOpenMorePacks)
+            Goto, CheckSpecialMissions  ; Don't check pack limits for inject methods
             
-            HomeAndMission(1)
+        HourglassOpening(true) ;7
+        if(cantOpenMorePacks)
+            Goto, CheckSpecialMissions  ; Don't check pack limits for inject methods
+
+        HomeAndMission()
+        if(beginnerMissionsDone)
+            Goto, EndOfRun
+            
+        SelectPack("HGPack")
+        if(cantOpenMorePacks)
+            Goto, EndOfRun
+        PackOpening() ;8
+        if(cantOpenMorePacks)
+            Goto, CheckSpecialMissions  ; Don't check pack limits for inject methods
+            
+        HourglassOpening(true) ;9
+        if(cantOpenMorePacks)
+            Goto, CheckSpecialMissions  ; Don't check pack limits for inject methods
+
+        HomeAndMission()
+        if(beginnerMissionsDone)
+            Goto, EndOfRun
+            
+        SelectPack("HGPack")
+        if(cantOpenMorePacks)
+            Goto, EndOfRun
+        PackOpening() ;10
+        if(cantOpenMorePacks)
+            Goto, CheckSpecialMissions  ; Don't check pack limits for inject methods
+            
+        HourglassOpening(true) ;11
+        if(cantOpenMorePacks)
+            Goto, CheckSpecialMissions  ; Don't check pack limits for inject methods
+        
+        ; Continue with the extended Inject Missions mission flow
+        if(injectMethod && loadedAccount && deleteMethod = "Inject Missions" ){			
+            HomeAndMission()
+            if(beginnerMissionsDone)
+                Goto, EndOfRun
+                
             SelectPack("HGPack")
             if(cantOpenMorePacks)
                 Goto, EndOfRun
             PackOpening() ;12
-            if(cantOpenMorePacks || (!friendIDs && friendID = "" && accountOpenPacks >= maxAccountPackNum))
-                Goto, EndOfRun
-            
-            HomeAndMission(1)
-            SelectPack("HGPack")
             if(cantOpenMorePacks)
-                Goto, EndOfRun
-            PackOpening() ;13
-            if(cantOpenMorePacks || (!friendIDs && friendID = "" && accountOpenPacks >= maxAccountPackNum))
-                Goto, EndOfRun
-                
-            beginnerMissionsDone := 1
-            if(injectMethod && loadedAccount)
-                setMetaData()
+                Goto, CheckSpecialMissions  ; Don't check pack limits for inject methods
+            
+            HourglassOpening(true) ;13
+            if(cantOpenMorePacks)
+                Goto, CheckSpecialMissions  ; Don't check pack limits for inject methods
         }
+        
+        HomeAndMission(1)
+        SelectPack("HGPack")
+        if(cantOpenMorePacks)
+            Goto, EndOfRun
+        PackOpening() ;12
+        if(cantOpenMorePacks)
+            Goto, CheckSpecialMissions  ; Don't check pack limits for inject methods
+        
+        HomeAndMission(1)
+        SelectPack("HGPack")
+        if(cantOpenMorePacks)
+            Goto, EndOfRun
+        PackOpening() ;13
+        if(cantOpenMorePacks)
+            Goto, CheckSpecialMissions  ; Don't check pack limits for inject methods
+            
+        beginnerMissionsDone := 1
+        if(injectMethod && loadedAccount)
+            setMetaData()
     }
+}
+
+CheckSpecialMissions:
+
+; ===== SPECIAL MISSIONS LOGIC - FIXED FOR INJECT METHODS =====
+; Check if we should do special missions (only if user has enabled them)
+shouldDoSpecialMissions := false
+
+; Check user settings first
+IniRead, claimSpecialMissions, %A_ScriptDir%\..\Settings.ini, UserSettings, claimSpecialMissions, 0
+IniRead, spendHourGlass, %A_ScriptDir%\..\Settings.ini, UserSettings, spendHourGlass, 0
+
+; Only proceed if user has enabled at least one of these features
+if (claimSpecialMissions = 1 || spendHourGlass = 1) {
+    ; For inject methods, execute if user enabled the features
+    if (InStr(deleteMethod, "Inject")) {
+        shouldDoSpecialMissions := true
+        LogToFile("Inject method detected - special missions/hourglass enabled by user, executing regardless of pack count (" . accountOpenPacks . ")")
+    }
+    ; For other methods, use the original logic
+    else {
+        shouldDoSpecialMissions := (!friendIDs && friendID = "" && accountOpenPacks < maxAccountPackNum) || (friendIDs || friendID != "")
+    }
+}
+
+if (shouldDoSpecialMissions) {
+    ; Special Missions - only if user enabled them
+    if(claimSpecialMissions = 1 && !specialMissionsDone) {
+        LogToFile("Executing special missions - User setting enabled, current pack count: " . accountOpenPacks)
+        GoToMain()
+        HomeAndMission(1)
+        GetEventRewards(true)
+        specialMissionsDone := 1
+        cantOpenMorePacks := 0
+        if(injectMethod && loadedAccount)
+            setMetaData()
+    }
+    
+    ; Hourglass spending - only if user enabled it
+    if(spendHourGlass = 1) {
+        LogToFile("Executing hourglass spending - User setting enabled, current pack count: " . accountOpenPacks)
+        SpendAllHourglass()
+    }
+}
 
 EndOfRun:
 
@@ -608,26 +677,6 @@ if (injectMethod && loadedAccount && cantOpenMorePacks) {
     
     ; Skip all the rest of EndOfRun and go directly to loading next account
     Goto, SkipExtras
-}
-
-; Continue with normal EndOfRun logic for special missions and hourglass
-if(!(!friendIDs && friendID = "" && accountOpenPacks >= maxAccountPackNum)) {
-    ; Special Missions - keep settings-based control
-    IniRead, claimSpecialMissions, %A_ScriptDir%\..\Settings.ini, UserSettings, claimSpecialMissions, 0
-    if(claimSpecialMissions = 1 && !specialMissionsDone) {
-        GoToMain()
-        HomeAndMission(1)
-        GetEventRewards(true)
-        specialMissionsDone := 1
-        cantOpenMorePacks := 0
-        if(injectMethod && loadedAccount)
-            setMetaData()
-    }
-    
-    IniRead, spendHourGlass, %A_ScriptDir%\..\Settings.ini, UserSettings, spendHourGlass, 0
-    if(spendHourGlass = 1) {
-        SpendAllHourglass()
-    }
 }
 
 SkipExtras:
@@ -820,6 +869,7 @@ if (injectMethod && !loadedAccount) {
     ; Skip the rest of the loop iteration
     Continue
 }
+
     }
 }
 return
@@ -940,7 +990,7 @@ clearMissionCache() {
 }
 
 RemoveFriends() {
-    global friendIDs, friended, injectMethod, deleteMethod
+    global friendIDs, friended, friendID, deleteMethod, injectMethod, loadedAccount
 
     if(!friendIDs && friendID = "") {
         friended := false
@@ -949,25 +999,20 @@ RemoveFriends() {
     
     packsInPool := 0 ; if friends are removed, clear the pool
 
+    ; Navigate to Social menu
     failSafe := A_TickCount
     failSafeTime := 0
-    
-    ; Enhanced navigation to Social menu with injection method consideration
     Loop {
         adbClick_wbb(143, 518)
         if(FindOrLoseImage(120, 500, 155, 530, , "Social", 0, failSafeTime))
             break
-        
-        ; Handle hourglass tutorial - but skip for injection methods with higher pack counts
-        if(FindOrLoseImage(175, 165, 255, 235, , "Hourglass3", 0)) {
-            ; Skip hourglass tutorial for Inject for Reroll accounts (they likely already completed it)
-            if(deleteMethod = "Inject for Reroll") {
-                LogToFile("Skipping hourglass tutorial for Inject for Reroll account")
-                adbClick_wbb(143, 518) ; Try clicking social again
+        else if(FindOrLoseImage(175, 165, 255, 235, , "Hourglass3", 0)) {
+            ; Skip hourglass tutorial for injection methods with higher pack counts
+            if(injectMethod && loadedAccount && (deleteMethod = "Inject for Reroll" || deleteMethod = "Inject Missions")) {
+                LogToFile("Skipping hourglass tutorial for injection account")
                 continue
             }
             
-            ; Normal hourglass tutorial handling for other accounts
             Delay(3)
             adbClick_wbb(146, 441)
             Delay(3)
@@ -980,180 +1025,235 @@ RemoveFriends() {
             Delay(1)
             adbClick_wbb(203, 436)
         }
-        
         Sleep, 500
         failSafeTime := (A_TickCount - failSafe) // 1000
         CreateStatusMessage("Waiting for Social`n(" . failSafeTime . "/90 seconds)")
         
         if (failSafeTime > 90) {
-            LogToFile("RemoveFriends: Timeout waiting for Social menu - attempting restart")
-            restartGameInstance("Stuck waiting for Social menu in RemoveFriends")
+            LogToFile("RemoveFriends: Failed to reach Social menu, attempting to go home and retry")
+            adbClick_wbb(40, 516) ; Try clicking home
+            Sleep, 1000
+            friended := false
             return false
         }
     }
     
-    ; Navigate to Add Friends section
-    FindImageAndClick(226, 100, 270, 135, , "Add", 38, 460, 500)
+    ; Try to navigate to Add Friends - with multiple approaches
+    addFriendsFound := false
+    
+    ; Method 1: Look for Add button (top right)
+    if(FindOrLoseImage(226, 100, 270, 135, , "Add", 0, 2)) {
+        adbClick_wbb(248, 117) ; Click Add button
+        Sleep, 1000
+        addFriendsFound := true
+        LogToFile("Found Add button, clicking it")
+    }
+    
+    ; Method 2: If no Add button, try looking for other navigation elements
+    if (!addFriendsFound) {
+        ; Check if we're already in the right place or need to navigate differently
+        if(FindOrLoseImage(205, 430, 255, 475, , "Search", 0, 1)) {
+            addFriendsFound := true
+            LogToFile("Already at friend search screen")
+        } else {
+            ; Try clicking different areas to get to add friends
+            adbClick_wbb(240, 120) ; Try clicking in the top area
+            Sleep, 1000
+            if(FindOrLoseImage(205, 430, 255, 475, , "Search", 0, 1)) {
+                addFriendsFound := true
+                LogToFile("Navigated to friend search via alternate method")
+            }
+        }
+    }
+    
+    ; If still not found, try a more aggressive approach
+    if (!addFriendsFound) {
+        LogToFile("Could not find Add Friends section, trying fallback navigation")
+        ; Try clicking various areas that might lead to friend search
+        adbClick_wbb(143, 400) ; Middle of screen
+        Sleep, 500
+        adbClick_wbb(200, 300) ; Different area
+        Sleep, 500
+        
+        if(FindOrLoseImage(205, 430, 255, 475, , "Search", 0, 1)) {
+            addFriendsFound := true
+            LogToFile("Found friend search via fallback method")
+        }
+    }
+    
+    ; If we still can't find the add friends section, give up gracefully
+    if (!addFriendsFound) {
+        LogToFile("Could not navigate to Add Friends section, skipping friend removal")
+        adbClick_wbb(40, 516) ; Go back to home
+        friended := false
+        return false
+    }
+    
+    ; Now we should be at the friend search screen
     FindImageAndClick(205, 430, 255, 475, , "Search", 240, 120, 1500)
     FindImageAndClick(0, 475, 25, 495, , "OK2", 138, 454)
     
-    ; Handle single friend ID vs multiple friend IDs
     if(!friendIDs) {
-        ; Single friend removal logic
-        RemoveSingleFriend(FriendID)
+        failSafe := A_TickCount
+        failSafeTime := 0
+        Loop {
+            adbInput(FriendID)
+            Delay(1)
+            if(FindOrLoseImage(205, 430, 255, 475, , "Search", 0, failSafeTime)) {
+                FindImageAndClick(0, 475, 25, 495, , "OK2", 138, 454)
+                EraseInput(1,1)
+            } else if(FindOrLoseImage(205, 430, 255, 475, , "Search2", 0, failSafeTime)) {
+                break
+            }
+            failSafeTime := (A_TickCount - failSafe) // 1000
+            CreateStatusMessage("Waiting for AddFriends1`n(" . failSafeTime . "/45 seconds)")
+            
+            if (failSafeTime > 45) {
+                LogToFile("Timeout during single friend search, aborting")
+                adbClick_wbb(40, 516) ; Go home
+                friended := false
+                return false
+            }
+        }
+        
+        failSafe := A_TickCount
+        failSafeTime := 0
+        Loop {
+            adbClick_wbb(232, 453)
+            if(FindOrLoseImage(165, 250, 190, 275, , "Send", 0, failSafeTime)) {
+                adbClick_wbb(243, 258)
+                Delay(2)
+                break
+            } else if(FindOrLoseImage(165, 240, 255, 270, , "Withdraw", 0, failSafeTime)) {
+                break
+            } else if(FindOrLoseImage(165, 250, 190, 275, , "Accepted", 0, failSafeTime)) {
+                FindImageAndClick(135, 355, 160, 385, , "Remove", 193, 258, 500)
+                FindImageAndClick(165, 250, 190, 275, , "Send", 200, 372, 500)
+                Delay(2)
+                adbClick_wbb(243, 258)
+                break
+            }
+            Sleep, 750
+            failSafeTime := (A_TickCount - failSafe) // 1000
+            CreateStatusMessage("Waiting for AddFriends2`n(" . failSafeTime . "/45 seconds)")
+            
+            if (failSafeTime > 45) {
+                LogToFile("Timeout during single friend removal, aborting")
+                break
+            }
+        }
         n := 1
     } else {
-        ; Multiple friends removal logic
-        n := RemoveMultipleFriends()
+        ;randomize friend id list to not back up mains if running in groups since they'll be sent in a random order.
+        n := friendIDs.MaxIndex()
+        Loop % n
+        {
+            i := n - A_Index + 1
+            Random, j, 1, %i%
+            temp := friendIDs[i] . ""
+            friendIDs[i] := friendIDs[j] . ""
+            friendIDs[j] := temp . ""
+        }
+        for index, value in friendIDs {
+            if (StrLen(value) != 16) {
+                continue
+            }
+            failSafe := A_TickCount
+            failSafeTime := 0
+            Loop {
+                adbInput(value)
+                Delay(1)
+                if(FindOrLoseImage(205, 430, 255, 475, , "Search", 0, failSafeTime)) {
+                    FindImageAndClick(0, 475, 25, 495, , "OK2", 138, 454)
+                    EraseInput()
+                } else if(FindOrLoseImage(205, 430, 255, 475, , "Search2", 0, failSafeTime)) {
+                    break
+                }
+                failSafeTime := (A_TickCount - failSafe) // 1000
+                CreateStatusMessage("Waiting for AddFriends3`n(" . failSafeTime . "/45 seconds)")
+                
+                if (failSafeTime > 45) {
+                    LogToFile("Timeout searching for friend: " . value)
+                    break
+                }
+            }
+            failSafe := A_TickCount
+            failSafeTime := 0
+            Loop {
+                adbClick_wbb(232, 453)
+                if(FindOrLoseImage(165, 250, 190, 275, , "Send", 0, failSafeTime)) {
+                    adbClick_wbb(243, 258)
+                    Delay(2)
+                    break
+                } else if(FindOrLoseImage(165, 240, 255, 270, , "Withdraw", 0, failSafeTime)) {
+                    break
+                } else if(FindOrLoseImage(165, 250, 190, 275, , "Accepted", 0, failSafeTime)) {
+                    FindImageAndClick(135, 355, 160, 385, , "Remove", 193, 258, 500)
+                    FindImageAndClick(165, 250, 190, 275, , "Send", 200, 372, 500)
+                    Delay(2)
+                    adbClick_wbb(243, 258)
+                    break
+                }
+                Sleep, 750
+                failSafeTime := (A_TickCount - failSafe) // 1000
+                CreateStatusMessage("Waiting for AddFriends4`n(" . failSafeTime . "/45 seconds)")
+                
+                if (failSafeTime > 45) {
+                    LogToFile("Timeout removing friend: " . value)
+                    break
+                }
+            }
+            if(index != friendIDs.maxIndex()) {
+                FindImageAndClick(205, 430, 255, 475, , "Search2", 150, 50, 1500)
+                FindImageAndClick(0, 475, 25, 495, , "OK2", 138, 454)
+                EraseInput(index, n)
+            }
+        }
     }
     
-    ; Navigate back to home
+    ; Navigate back to Social and then Home
     FindImageAndClick(120, 500, 155, 530, , "Social", 143, 518, 500)
     
-    ; Handle showcase likes if configured
-    HandleShowcaseLikes()
-    
-    FindImageAndClick(20, 500, 55, 530, , "Home", 40, 516, 500)
-    
-    friended := false
-    return n
-}
-
-RemoveSingleFriend(friendID) {
-    failSafe := A_TickCount
-    failSafeTime := 0
-    Loop {
-        adbInput(friendID)
-        Delay(1)
-        if(FindOrLoseImage(205, 430, 255, 475, , "Search", 0, failSafeTime)) {
-            FindImageAndClick(0, 475, 25, 495, , "OK2", 138, 454)
-            EraseInput(1,1)
-        } else if(FindOrLoseImage(205, 430, 255, 475, , "Search2", 0, failSafeTime)) {
-            break
-        }
-        failSafeTime := (A_TickCount - failSafe) // 1000
-        CreateStatusMessage("Waiting for friend search`n(" . failSafeTime . "/45 seconds)")
-        
-        if (failSafeTime > 45) {
-            LogToFile("RemoveSingleFriend: Timeout during friend search")
-            return false
-        }
-    }
-    
-    ; Remove the friend
-    ProcessFriendRemoval()
-}
-
-RemoveMultipleFriends() {
-    ; Randomize friend ID list
-    n := friendIDs.MaxIndex()
-    Loop % n {
-        i := n - A_Index + 1
-        Random, j, 1, %i%
-        temp := friendIDs[i] . ""
-        friendIDs[i] := friendIDs[j] . ""
-        friendIDs[j] := temp . ""
-    }
-    
-    for index, value in friendIDs {
-        if (StrLen(value) != 16) {
-            continue ; Skip invalid IDs
-        }
-        
-        ; Search for friend
-        SearchForFriend(value)
-        
-        ; Remove the friend
-        ProcessFriendRemoval()
-        
-        ; Navigate to next search if not the last friend
-        if(index != friendIDs.maxIndex()) {
-            FindImageAndClick(205, 430, 255, 475, , "Search2", 150, 50, 1500)
-            FindImageAndClick(0, 475, 25, 495, , "OK2", 138, 454)
-            EraseInput(index, n)
-        }
-    }
-    
-    return n
-}
-
-SearchForFriend(friendID) {
-    failSafe := A_TickCount
-    failSafeTime := 0
-    Loop {
-        adbInput(friendID)
-        Delay(1)
-        if(FindOrLoseImage(205, 430, 255, 475, , "Search", 0, failSafeTime)) {
-            FindImageAndClick(0, 475, 25, 495, , "OK2", 138, 454)
-            EraseInput()
-        } else if(FindOrLoseImage(205, 430, 255, 475, , "Search2", 0, failSafeTime)) {
-            break
-        }
-        failSafeTime := (A_TickCount - failSafe) // 1000
-        CreateStatusMessage("Searching for friend`n(" . failSafeTime . "/45 seconds)")
-        
-        if (failSafeTime > 45) {
-            LogToFile("SearchForFriend: Timeout searching for friend: " . friendID)
-            return false
-        }
-    }
-    return true
-}
-
-ProcessFriendRemoval() {
-    failSafe := A_TickCount
-    failSafeTime := 0
-    Loop {
-        adbClick_wbb(232, 453)
-        if(FindOrLoseImage(165, 250, 190, 275, , "Send", 0, failSafeTime)) {
-            break
-        } else if(FindOrLoseImage(165, 250, 190, 275, , "Accepted", 0, failSafeTime)) {
-            FindImageAndClick(135, 355, 160, 385, , "Remove", 193, 258, 500)
-            FindImageAndClick(165, 250, 190, 275, , "Send", 200, 372, 2000)
-            break
-        } else if(FindOrLoseImage(165, 240, 255, 270, , "Withdraw", 0, failSafeTime)) {
-            FindImageAndClick(165, 250, 190, 275, , "Send", 243, 258, 2000)
-            break
-        }
-        Sleep, 750
-        failSafeTime := (A_TickCount - failSafe) // 1000
-        CreateStatusMessage("Processing friend removal`n(" . failSafeTime . "/45 seconds)")
-        
-        if (failSafeTime > 45) {
-            LogToFile("ProcessFriendRemoval: Timeout during friend removal")
-            return false
-        }
-    }
-}
-
-HandleShowcaseLikes() {
+    ; Handle showcase likes (inline to avoid function call issues)
     IniRead, showcaseNumber, %A_ScriptDir%\..\Settings.ini, UserSettings, showcaseLikes, 1
-    if (showcaseNumber > 0) {
+    if ( showcaseNumber > 0)
+    {
         showcaseNumber -= 1
         IniWrite, %showcaseNumber%, %A_ScriptDir%\..\Settings.ini, UserSettings, showcaseLikes
         Delay(5)
-        
-        ; Showcase liking logic
+        ; Liking friend showcase script
+        ; clicking showcase button
         adbClick_wbb(80, 400)
         Delay(10)
-        
         Loop, Read, %A_ScriptDir%\..\showcase_ids.txt
         {
             showcaseID := Trim(A_LoopReadLine)
+            ; clicking friend id search
             adbClick_wbb(220, 467)
             Delay(3)
+            ; clicking search bar
             adbClick_wbb(152, 272)
             Delay(3)
+            ;pasting id
             adbInput(showcaseID)
             Delay(1)
+            ;pressing ok
             adbClick_wbb(212, 384)
             Delay(3)
+            ;pressing like on showcase
             adbClick_wbb(133, 192)
             Delay(3)
+            ;going back to community showcases
             adbClick_wbb(133, 492)
             Delay(3)
         }
     }
+    
+    FindImageAndClick(20, 500, 55, 530, , "Home", 40, 516, 500)
+    friended := false
+    
+    LogToFile("RemoveFriends completed successfully")
+    return n
 }
 
 TradeTutorial() {
@@ -2588,23 +2688,51 @@ loadAccount() {
     accountFileNameOrig := ""
     accountHasPackInfo := 0
     
-    ; ===== MINIMAL LIST CHECK =====
+    ; ===== IMPROVED LIST CHECK - NO AUTO-REGENERATION =====
     if (!FileExist(outputTxt)) {
-        createAccountList(scriptName)
+        LogToFile("list_current.txt does not exist - checking if regeneration is needed based on time")
+        
+        lastGeneratedFile := saveDir . "\list_last_generated.txt"
+        needRegeneration := false
+        
+        if (FileExist(lastGeneratedFile)) {
+            FileRead, lastGenTime, %lastGeneratedFile%
+            timeDiff := A_Now
+            EnvSub, timeDiff, %lastGenTime%, Minutes
+            
+            LogToFile("Last list generation was " . timeDiff . " minutes ago")
+            
+            ; Only regenerate if it's been more than 60 minutes
+            if (timeDiff > 60) {
+                LogToFile("Time-based regeneration triggered (60+ minutes elapsed)")
+                createAccountList(scriptName)
+            } else {
+                LogToFile("Not enough time elapsed for regeneration - no eligible accounts available")
+                return false
+            }
+        } else {
+            LogToFile("No previous generation timestamp found - generating initial list")
+            createAccountList(scriptName)
+        }
+    } else {
+        LogToFile("list_current.txt exists - proceeding with account selection")
     }
     
     ; ===== INSTANT ACCOUNT GRAB =====
     FileRead, fileContent, %outputTxt%
     if (!fileContent) {
+        LogToFile("list_current.txt is empty - no accounts available")
         return false
     }
     
     fileLines := StrSplit(fileContent, "`n", "`r")
     if (!fileLines.MaxIndex() || fileLines.MaxIndex() < 1) {
+        LogToFile("list_current.txt has no valid lines - no accounts available")
         return false
     }
     
     ; Take the first valid line immediately
+    selectedIndex := 0
     Loop, % fileLines.MaxIndex() {
         currentFile := Trim(fileLines[A_Index])
         if (StrLen(currentFile) >= 5 && InStr(currentFile, ".xml")) {
@@ -2613,40 +2741,49 @@ loadAccount() {
                 ; Found valid account - take it immediately
                 accountFileName := currentFile
                 loadFile := testFile
-                
-                ; Remove from list quickly
-                newContent := ""
-                Loop, % fileLines.MaxIndex() {
-                    if (A_Index != A_Index) ; This line will be skipped
-                        newContent .= fileLines[A_Index] . "`n"
-                }
-                ; Actually remove the selected account
                 selectedIndex := A_Index
-                newContent := ""
-                Loop, % fileLines.MaxIndex() {
-                    if (A_Index != selectedIndex)
-                        newContent .= fileLines[A_Index] . "`n"
-                }
                 
-                FileDelete, %outputTxt%
-                if (newContent)
-                    FileAppend, %newContent%, %outputTxt%
-                
+                LogToFile("Selected account for loading: " . accountFileName . " (position " . selectedIndex . " in list)")
                 break
+            } else {
+                LogToFile("Account file does not exist: " . testFile . " - skipping")
             }
         }
     }
     
     if (!accountFileName) {
+        LogToFile("No valid account files found in list_current.txt")
         return false
     }
 
+    ; Remove the selected account from list
+    newContent := ""
+    Loop, % fileLines.MaxIndex() {
+        if (A_Index != selectedIndex) {
+            line := Trim(fileLines[A_Index])
+            if (line) {
+                newContent .= line . "`n"
+            }
+        }
+    }
+    
+    FileDelete, %outputTxt%
+    if (newContent) {
+        FileAppend, %newContent%, %outputTxt%
+        LogToFile("Removed selected account from list - " . (fileLines.MaxIndex() - 1) . " accounts remaining")
+    } else {
+        LogToFile("list_current.txt is now empty after removing selected account")
+    }
+
     ; ===== FAST ACCOUNT LOADING =====
+    LogToFile("Starting account loading process for: " . accountFileName)
+    
     waitadb()
     adbShell.StdIn.WriteLine("am force-stop jp.pokemon.pokemontcgp")
     waitadb()
     Sleep, 2000  ; Reduced from 3000
     
+    LogToFile("Pushing account file to device: " . loadFile)
     RunWait, % adbPath . " -s 127.0.0.1:" . adbPort . " push " . loadFile . " /sdcard/deviceAccount.xml",, Hide
     Sleep, 2000  ; Reduced from 3000
     
@@ -2667,33 +2804,39 @@ loadAccount() {
         accountOpenPacks := accountFileNameParts[1]
         accountFileNameTmp := accountFileNameParts[2]
         accountHasPackInfo := 1
+        LogToFile("Parsed pack count from filename: " . accountOpenPacks . " packs")
     } else {
         accountFileNameOrig := accountFileName
+        LogToFile("No pack count found in filename, will attempt OCR detection")
     }
     
     getMetaData()
     TrackUsedAccount(accountFileName)
     
+    LogToFile("Successfully loaded account: " . accountFileName)
     return loadFile
 }
 
 saveAccount(file := "Valid", ByRef filePath := "", packDetails := "") {
+    global winTitle, beginnerMissionsDone, soloBattleMissionDone, intermediateMissionsDone, specialMissionsDone, accountHasPackInTesting
+    global accountOpenPacks, packsInPool, adbShell, adbPath, adbPort, scriptName, Debug
+    ; A_Now is a built-in AutoHotkey variable and doesn't need to be declared
 
     filePath := ""
 
     if (file = "All") {
-		metadata := ""
-		if(beginnerMissionsDone)
-			metadata .= "B"
-		if(soloBattleMissionDone)
-			metadata .= "S"
-		if(intermediateMissionsDone)
-			metadata .= "I"
-		if(specialMissionsDone)
-			metadata .= "X"
-                if(accountHasPackInTesting)
-                        metadata .= "T"
-			
+        metadata := ""
+        if(beginnerMissionsDone)
+            metadata .= "B"
+        if(soloBattleMissionDone)
+            metadata .= "S"
+        if(intermediateMissionsDone)
+            metadata .= "I"
+        if(specialMissionsDone)
+            metadata .= "X"
+        if(accountHasPackInTesting)
+            metadata .= "T"
+            
         saveDir := A_ScriptDir "\..\Accounts\Saved\" . winTitle
         filePath := saveDir . "\" . accountOpenPacks . "P_" . A_Now . "_" . winTitle . "(" . metadata . ").xml"
     } else if (file = "Valid" || file = "Invalid") {
@@ -2702,7 +2845,7 @@ saveAccount(file := "Valid", ByRef filePath := "", packDetails := "") {
         filePath := saveDir . xmlFile
     } else if (file = "Tradeable") {
         saveDir := A_ScriptDir "\..\Accounts\Trades\"
-		;packsInPool doesn't make sense but nothing does, really.
+        ;packsInPool doesn't make sense but nothing does, really.
         xmlFile := A_Now . "_" . winTitle . "_" . file . (packDetails ? "_" . packDetails : "") . "_" . packsInPool . "_packs.xml"
         filePath := saveDir . xmlFile
     } else {
@@ -2746,6 +2889,8 @@ saveAccount(file := "Valid", ByRef filePath := "", packDetails := "") {
         count++
     }
 
+    ; Extract just the filename for return value
+    SplitPath, filePath, xmlFile
     return xmlFile
 }
 
@@ -2755,10 +2900,101 @@ TrackUsedAccount(fileName) {
     saveDir := A_ScriptDir "\..\Accounts\Saved\" . winTitle
     usedAccountsLog := saveDir . "\used_accounts.txt"
     
-    ; Append the file name with timestamp
+    ; Get current time in a consistent format
     currentTime := A_Now
-    FileAppend, % fileName . "|" . currentTime . "`n", %usedAccountsLog%
+    
+    ; Read existing content to avoid duplicates
+    existingContent := ""
+    if (FileExist(usedAccountsLog)) {
+        FileRead, existingContent, %usedAccountsLog%
+    }
+    
+    ; Check if this account is already logged recently (within last hour)
+    ; This prevents duplicate entries if the same account gets loaded multiple times quickly
+    alreadyLogged := false
+    if (existingContent) {
+        Loop, Parse, existingContent, `n, `r
+        {
+            if (A_LoopField) {
+                parts := StrSplit(A_LoopField, "|")
+                if (parts.Length() >= 2) {
+                    loggedFileName := Trim(parts[1])
+                    loggedTime := Trim(parts[2])
+                    
+                    if (loggedFileName = fileName) {
+                        ; Check if it was logged in the last hour
+                        timeDiff := currentTime
+                        EnvSub, timeDiff, %loggedTime%, Minutes
+                        
+                        if (timeDiff < 60) {
+                            alreadyLogged := true
+                            LogToFile("TRACKING: Account " . fileName . " already logged " . timeDiff . " minutes ago - skipping duplicate entry")
+                            break
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    ; Only add new entry if not recently logged
+    if (!alreadyLogged) {
+        FileAppend, % fileName . "|" . currentTime . "`n", %usedAccountsLog%
+        LogToFile("TRACKING: Used account recorded - " . fileName . " at " . currentTime)
+    }
 }
+
+CleanupUsedAccountsLog(instanceName := "") {
+    if (!instanceName)
+        instanceName := winTitle
+        
+    saveDir := A_ScriptDir "\..\Accounts\Saved\" . instanceName
+    usedAccountsLog := saveDir . "\used_accounts.txt"
+    
+    if (!FileExist(usedAccountsLog)) {
+        LogToFile("No used accounts log to clean for instance " . instanceName)
+        return 0
+    }
+    
+    FileRead, usedAccountsContent, %usedAccountsLog%
+    newUsedContent := ""
+    currentTime := A_Now
+    cleanedCount := 0
+    keptCount := 0
+    
+    Loop, Parse, usedAccountsContent, `n, `r
+    {
+        if (A_LoopField && StrLen(Trim(A_LoopField)) > 0) {
+            parts := StrSplit(A_LoopField, "|")
+            if (parts.Length() >= 2) {
+                fileName := Trim(parts[1])
+                timeUsed := Trim(parts[2])
+                
+                if (fileName && timeUsed) {
+                    timeDiff := currentTime
+                    EnvSub, timeDiff, %timeUsed%, Hours
+                    
+                    ; Keep only entries less than 24 hours old (1 day)
+                    if (timeDiff < 24 && timeDiff >= 0) {
+                        newUsedContent .= fileName . "|" . timeUsed . "`n"
+                        keptCount++
+                    } else {
+                        cleanedCount++
+                    }
+                }
+            }
+        }
+    }
+    
+    ; Rewrite the file
+    FileDelete, %usedAccountsLog%
+    if (newUsedContent)
+        FileAppend, %newUsedContent%, %usedAccountsLog%
+    
+    LogToFile("Manual cleanup for " . instanceName . ": " . keptCount . " kept, " . cleanedCount . " cleaned (24hr cooldown)")
+    return cleanedCount
+}
+
 UpdateAccount() {
     global accountOpenPacks, accountFileName, accountFileNameParts, accountFileNameOrig, ocrSuccess, winTitle
     global aminutes, aseconds, rerolls
@@ -2794,26 +3030,26 @@ ControlClick(X, Y) {
 }
 
 DownloadFile(url, filename) {
-    url := url  ; Change to your hosted .txt URL "https://pastebin.com/raw/vYxsiqSs"
-    RegRead, proxyEnabled, HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Internet Settings, ProxyEnable
+	url := url  ; Change to your hosted .txt URL "https://pastebin.com/raw/vYxsiqSs"
+	RegRead, proxyEnabled, HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Internet Settings, ProxyEnable
 	RegRead, proxyServer, HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Internet Settings, ProxyServer
-    localPath = %A_ScriptDir%\..\%filename% ; Change to the folder you want to save the file
-    errored := false
-    try {
-        whr := ComObjCreate("WinHttp.WinHttpRequest.5.1")
-        if (proxyEnabled)
+	localPath = %A_ScriptDir%\..\%filename% ; Change to the folder you want to save the file
+	errored := false
+	try {
+		whr := ComObjCreate("WinHttp.WinHttpRequest.5.1")
+		if (proxyEnabled)
 			whr.SetProxy(2, proxyServer)
-        whr.Open("GET", url, true)
-        whr.Send()
-        whr.WaitForResponse()
-        ids := whr.ResponseText
-    } catch {
-        errored := true
-    }
-    if(!errored) {
-        FileDelete, %localPath%
-        FileAppend, %ids%, %localPath%
-    }
+		whr.Open("GET", url, true)
+		whr.Send()
+		whr.WaitForResponse()
+		ids := whr.ResponseText
+	} catch {
+		errored := true
+	}
+	if(!errored) {
+		FileDelete, %localPath%
+		FileAppend, %ids%, %localPath%
+	}
 }
 
 ReadFile(filename, numbers := false) {
@@ -3768,34 +4004,34 @@ Delay(1)
 
 SelectPack(HG := false) {
     global openPack, packArray, cantOpenMorePacks, injectMethod, loadedAccount
-	
-    ; IMMEDIATE CHECK: Exit if cantOpenMorePacks is already set
-    if (cantOpenMorePacks && injectMethod && loadedAccount) {
-        LogToFile("SelectPack called but cantOpenMorePacks=1, exiting immediately")
-        CreateStatusMessage("Not enough items, skipping pack selection...",,,, false)
+    
+    ; Only exit early if we're in hourglass mode and have no items
+    if (cantOpenMorePacks && HG = "HGPack") {
+        LogToFile("SelectPack called but cantOpenMorePacks=1 for HGPack, exiting immediately")
+        CreateStatusMessage("Not enough items for hourglass pack, skipping...",,,, false)
         return
     }
-	
-	; define constants
-	MiddlePackX := 140
-	RightPackX := 215
-	LeftPackX := 60
-	HomeScreenAllPackY := 203
-	
-	PackScreenAllPackY := 320
-	
-	SelectExpansionFirstRowY := 275
-	SelectExpansionSecondRowY := 410
-	
-	SelectExpansionRightCollumnMiddleX := 200
-	SelectExpansionLeftCollumnMiddleX := 73
-	3PackExpansionLeft := -40
-	3PackExpansionRight := 40
-	2PackExpansionLeft := -20
-	2PackExpansionRight := 20
-	
-	inselectexpansionscreen := 0
-	
+    
+    ; define constants
+    MiddlePackX := 140
+    RightPackX := 215
+    LeftPackX := 60
+    HomeScreenAllPackY := 203
+    
+    PackScreenAllPackY := 320
+    
+    SelectExpansionFirstRowY := 275
+    SelectExpansionSecondRowY := 410
+    
+    SelectExpansionRightCollumnMiddleX := 200
+    SelectExpansionLeftCollumnMiddleX := 73
+    3PackExpansionLeft := -40
+    3PackExpansionRight := 40
+    2PackExpansionLeft := -20
+    2PackExpansionRight := 20
+    
+    inselectexpansionscreen := 0
+    
     packy := HomeScreenAllPackY
     if (openPack = "Solgaleo") {
         packx := MiddlePackX
@@ -3804,105 +4040,115 @@ SelectPack(HG := false) {
     } else {
         packx := LeftPackX
     }
-	
-	if(openPack = "Solgaleo" || openPack = "Lunala" || openPack = "Shining") {
-		PackIsInHomeScreen := 1
-	} else {
-		PackIsInHomeScreen := 0
-	}
-	
-	if(openPack = "Solgaleo" || openPack = "Lunala") {
-		PackIsLatest := 1
-	} else {
-		PackIsLatest := 0
-	}
-		
-	if (openPack = "Solgaleo" || openPack = "Lunala" || openPack = "Shining" || openPack = "Arceus" || openPack = "Dialga" || openPack = "Palkia") {
-		packInTopRowsOfSelectExpansion := 1
-	} else {
-		packInTopRowsOfSelectExpansion := 0
-	}
-	
-	
+    
+    if(openPack = "Solgaleo" || openPack = "Lunala" || openPack = "Shining") {
+        PackIsInHomeScreen := 1
+    } else {
+        PackIsInHomeScreen := 0
+    }
+    
+    if(openPack = "Solgaleo" || openPack = "Lunala") {
+        PackIsLatest := 1
+    } else {
+        PackIsLatest := 0
+    }
+        
+    if (openPack = "Solgaleo" || openPack = "Lunala" || openPack = "Shining" || openPack = "Arceus" || openPack = "Dialga" || openPack = "Palkia") {
+        packInTopRowsOfSelectExpansion := 1
+    } else {
+        packInTopRowsOfSelectExpansion := 0
+    }
 
-	if(HG = "First" && injectMethod && loadedAccount ){
-		; when First and injection, if there are free packs, we don't land/start in home screen, 
-		; and we have also to search for closed during pack, hourglass, etc.
-		
-		failSafe := A_TickCount
-		failSafeTime := 0
-		Loop {
-			adbClick_wbb(PackX, HomeScreenAllPackY) ; click until points appear (if free packs, will land in pack scree, if no free packs, this will select the middle pack and go to same screen as if there were free packs)
-			Delay(1)
-			if(FindOrLoseImage(233, 400, 264, 428, , "Points", 0, failSafeTime)) {
-				break
-			}
-			else if(!renew && !getFC) {
-				if(FindOrLoseImage(241, 377, 269, 407, , "closeduringpack", 0)) {
-					adbClick_wbb(139, 371)
-				}
-			}
-			else if(FindOrLoseImage(175, 165, 255, 235, , "Hourglass3", 0)) {
-				;TODO hourglass tutorial still broken after injection
-				Delay(3)
-				adbClick_wbb(146, 441) ; 146 440
-				Delay(3)
-				adbClick_wbb(146, 441)
-				Delay(3)
-				adbClick_wbb(146, 441)
-				Delay(3)
+    ; FIXED: Improved injection logic for First pack selection
+    if(HG = "First" && injectMethod && loadedAccount) {
+        ; For injection accounts, we need to navigate to pack screen properly
+        failSafe := A_TickCount
+        failSafeTime := 0
+        
+        ; First, ensure we're at the main menu
+        Loop {
+            if(FindOrLoseImage(233, 400, 264, 428, , "Points", 0, failSafeTime)) {
+                break
+            }
+            
+            ; Handle various states we might be in
+            if(FindOrLoseImage(241, 377, 269, 407, , "closeduringpack", 0)) {
+                adbClick_wbb(139, 371)
+                Delay(2)
+            }
+            else if(FindOrLoseImage(175, 165, 255, 235, , "Hourglass3", 0)) {
+                ; Handle hourglass tutorial
+                Delay(3)
+                adbClick_wbb(146, 441)
+                Delay(3)
+                adbClick_wbb(146, 441)
+                Delay(3)
+                adbClick_wbb(146, 441)
+                Delay(3)
+                FindImageAndClick(98, 184, 151, 224, , "Hourglass1", 168, 438, 500, 5)
+                Delay(1)
+                adbClick_wbb(203, 436)
+            }
+            else {
+                ; Try clicking the pack area to get to pack screen
+                adbClick_wbb(packx, HomeScreenAllPackY)
+                Delay(2)
+            }
+            
+            failSafeTime := (A_TickCount - failSafe) // 1000
+            CreateStatusMessage("Navigating to pack screen (" . failSafeTime . "/90 seconds)")
+            
+            if (failSafeTime > 90) {
+                LogToFile("Failed to navigate to pack screen in injection mode")
+                break
+            }
+        }
+        
+        ; FIXED: Better handling for friends vs no friends in injection mode
+        if(!friendIDs && friendID = "") {
+            ; No friends - we can go directly to pack selection
+            if(PackIsLatest) {
+                ; Latest pack - should already be selected
+                packy := PackScreenAllPackY
+                if(packx != MiddlePackX) {
+                    Delay(2)
+                    adbClick_wbb(packx, packy) 
+                    Delay(2)
+                }
+            } else {
+                ; Older pack - need to use "Select other boosters"
+                FindImageAndClick(115, 140, 160, 155, , "SelectExpansion", 248, 459, 3000)
+                inselectexpansionscreen := 1
+            } 
+        } else {
+            ; Have friends - go through normal pack selection from home
+            FindImageAndClick(233, 400, 264, 428, , "Points", packx, packy, 3000)
+        }
+        
+        ; FIXED: Add pack stats detection here for injection accounts
+        if(!accountHasPackInfo) {
+            FindPackStats()
+        }
+    } else {
+        ; Non-injection or non-First pack selection - use original logic
+        FindImageAndClick(233, 400, 264, 428, , "Points", packx, packy, 3000)
+    }
 
-				FindImageAndClick(98, 184, 151, 224, , "Hourglass1", 168, 438, 500, 5) ;stop at hourglasses tutorial 2
-				Delay(1)
-
-				adbClick_wbb(203, 436) ; 203 436
-				FindImageAndClick(236, 198, 266, 226, , "Hourglass2", 180, 436, 500) ;stop at hourglasses tutorial 2 180 to 203?
-			}
-
-			failSafeTime := (A_TickCount - failSafe) // 1000
-			CreateStatusMessage("Waiting for Points`n(" . failSafeTime . "/90 seconds)")
-		}
-		
-		if(!friendIDs && friendID = "") {
-			; if we don't need to add any friends we can select directly the latest packs, or go directly to select other booster screen, 
-				
-			if(PackIsLatest) {   ; if selected pack is the latest pack select directly from the pack select screen
-				packy := PackScreenAllPackY ; Y coordinate is lower when in pack select screen then in home screen
-				
-				if(packx != MiddlePackX) { ; if it is already the middle Pack, no need to click again
-					Delay(10)
-					adbClick_wbb(packx, packy) 
-					Delay(10)
-				}
-			} else {
-				FindImageAndClick(115, 140, 160, 155, , "SelectExpansion", 248, 459, 3000) ; if selected pack is not the latest pack click directly select other boosters
-				
-				if(PackIsInHomeScreen) {
-					; the only one that is not handled below because should show in home page
-					inselectexpansionscreen := 1
-				}
-			} 
-		}
-	} else {
-		; if not first or not injected, or friends were added, always start from home page
-		FindImageAndClick(233, 400, 264, 428, , "Points", packx, packy, 3000)  ; open selected pack from home page
-	}
-
-	; if not the ones showing in home screen, click select other booster packs
+    ; if not the ones showing in home screen, click select other booster packs
     if (!PackIsInHomeScreen && !inselectexpansionscreen) {
         FindImageAndClick(115, 140, 160, 155, , "SelectExpansion", 248, 459, 3000)
-		inselectexpansionscreen := 1
-	}
-	
-	if(inselectexpansionscreen) {
+        inselectexpansionscreen := 1
+    }
+    
+    if(inselectexpansionscreen) {
         if (!packInTopRowsOfSelectExpansion) {
             ; Swipe down
             adbSwipe("266 770 266 355 160")
             Sleep, 500
 
             packy := 470 ; after swiping use this Y coordinate
-			
-			if (openPack = "Mew") {
+            
+            if (openPack = "Mew") {
                 packx := SelectExpansionLeftCollumnMiddleX
             } else if (openPack = "Charizard") {
                 packx := SelectExpansionRightCollumnMiddleX + 3PackExpansionLeft
@@ -3910,41 +4156,35 @@ SelectPack(HG := false) {
                 packx := SelectExpansionRightCollumnMiddleX
             } else if (openPack = "Pikachu") {
                 packx := SelectExpansionRightCollumnMiddleX + 3PackExpansionRight
-            
             }
         } else {
             if (openPack = "Solgaleo") {
-				packy := SelectExpansionFirstRowY
+                packy := SelectExpansionFirstRowY
                 packx := SelectExpansionLeftCollumnMiddleX + 2PackExpansionLeft
             } else if (openPack = "Lunala") {
-				packy := SelectExpansionFirstRowY
+                packy := SelectExpansionFirstRowY
                 packx := SelectExpansionLeftCollumnMiddleX + 2PackExpansionRight
             } else if (openPack = "Shining") {
-				packy := SelectExpansionFirstRowY
+                packy := SelectExpansionFirstRowY
                 packx := SelectExpansionRightCollumnMiddleX 
             } else if (openPack = "Arceus") {
-				packy := SelectExpansionSecondRowY
+                packy := SelectExpansionSecondRowY
                 packx := SelectExpansionLeftCollumnMiddleX
             } else if (openPack = "Dialga") {
-				packy := SelectExpansionSecondRowY
+                packy := SelectExpansionSecondRowY
                 packx := SelectExpansionRightCollumnMiddleX + 2PackExpansionLeft
             } else if (openPack = "Palkia") {
-				packy := SelectExpansionSecondRowY
+                packy := SelectExpansionSecondRowY
                 packx := SelectExpansionRightCollumnMiddleX + 2PackExpansionRight
             }
         }
 
         FindImageAndClick(233, 400, 264, 428, , "Points", packx, packy)
     }
-	
-	
-	if(HG = "First" && injectMethod && loadedAccount && !accountHasPackInfo) {
-		FindPackStats()
-	}
-	
-	
+    
+    ; Handle special cases
     if(HG = "Tutorial") {
-        FindImageAndClick(236, 198, 266, 226, , "Hourglass2", 180, 436, 500) ;stop at hourglasses tutorial 2 180 to 203?
+        FindImageAndClick(236, 198, 266, 226, , "Hourglass2", 180, 436, 500)
     }
     else if(HG = "HGPack") {
         failSafe := A_TickCount
@@ -3959,8 +4199,8 @@ SelectPack(HG := false) {
             }else if(FindOrLoseImage(92, 299, 115, 317, , "notenoughitems", 0)) {
                 cantOpenMorePacks := 1
             }
-			if(cantOpenMorePacks)
-				return
+            if(cantOpenMorePacks)
+                return
             adbClick_wbb(146, 439)
             Delay(1)
             failSafeTime := (A_TickCount - failSafe) // 1000
@@ -3978,22 +4218,28 @@ SelectPack(HG := false) {
             CreateStatusMessage("Waiting for HourglassPack4`n(" . failSafeTime . "/45 seconds)")
         }
     }
-    ;if(HG != "Tutorial")
-        failSafe := A_TickCount
-        failSafeTime := 0
-        Loop {
-            if(FindImageAndClick(233, 486, 272, 519, , "Skip2", 172, 430, , 2)) { ;click on open button until skip button appears
-                break
-			} else if(FindOrLoseImage(92, 299, 115, 317, , "notenoughitems", 0)) {
-				cantOpenMorePacks := 1
-			}
-			if(cantOpenMorePacks)
-				return
-            Delay(1)
-            adbClick_wbb(200, 451) ;for hourglass???
-            failSafeTime := (A_TickCount - failSafe) // 1000
-            CreateStatusMessage("Waiting for Skip2`n(" . failSafeTime . "/45 seconds)")
+    
+    ; Final step - wait for pack opening screen
+    failSafe := A_TickCount
+    failSafeTime := 0
+    Loop {
+        if(FindImageAndClick(233, 486, 272, 519, , "Skip2", 172, 430, , 2)) {
+            break
+        } else if(FindOrLoseImage(92, 299, 115, 317, , "notenoughitems", 0)) {
+            cantOpenMorePacks := 1
         }
+        if(cantOpenMorePacks)
+            return
+        Delay(1)
+        adbClick_wbb(200, 451)
+        failSafeTime := (A_TickCount - failSafe) // 1000
+        CreateStatusMessage("Waiting for Skip2`n(" . failSafeTime . "/45 seconds)")
+        
+        if (failSafeTime > 45) {
+            LogToFile("Timeout waiting for pack opening screen")
+            break
+        }
+    }
 }
 
 PackOpening() {
@@ -4417,42 +4663,43 @@ createAccountList(instance) {
     global injectSortMethod, deleteMethod, injectVariable, winTitle, verboseLogging
     global injectMaxValue, injectMinValue, injectRange
     
+    LogToFile("=== STARTING ACCOUNT LIST GENERATION ===")
+    LogToFile("Instance: " . instance . ", Delete Method: " . deleteMethod)
+    
     saveDir := A_ScriptDir "\..\Accounts\Saved\" . instance
     outputTxt := saveDir . "\list.txt"
     outputTxt_current := saveDir . "\list_current.txt"
     lastGeneratedFile := saveDir . "\list_last_generated.txt"
     
-    ; Check if we need to regenerate the lists
+    ; Check if we need to regenerate the lists (TIME-BASED ONLY)
     needRegeneration := false
     
-    ; Check if list files exist
-    if (!FileExist(outputTxt) || !FileExist(outputTxt_current)) {
-        needRegeneration := true
-        LogToFile("List files don't exist, regenerating...")
+    ; Check when lists were last generated
+    lastGenTime := 0
+    if (FileExist(lastGeneratedFile)) {
+        FileRead, lastGenTime, %lastGeneratedFile%
+        LogToFile("Last generation timestamp found: " . lastGenTime)
     } else {
-        ; Check when lists were last generated
-        lastGenTime := 0
-        if (FileExist(lastGeneratedFile)) {
-            FileRead, lastGenTime, %lastGeneratedFile%
-        }
-        
-        ; Calculate time difference
-        timeDiff := A_Now
-        EnvSub, timeDiff, %lastGenTime%, Minutes
-        
-        ; Regenerate if it's been more than 60 minutes (1 hour)
-        regenerationInterval := 60  ; in minutes
-        if (timeDiff > regenerationInterval || !lastGenTime) {
-            needRegeneration := true
-            LogToFile("Lists last generated " . timeDiff . " minutes ago, regenerating...")
-        } else {
-            LogToFile("Lists generated " . timeDiff . " minutes ago, reusing existing lists")
-            return  ; Exit the function early, no need to regenerate
-        }
+        LogToFile("No previous generation timestamp found")
+    }
+    
+    ; Calculate time difference
+    timeDiff := A_Now
+    EnvSub, timeDiff, %lastGenTime%, Minutes
+    
+    ; Regenerate if it's been more than 60 minutes (1 hour) OR no previous generation
+    regenerationInterval := 60  ; in minutes
+    if (timeDiff > regenerationInterval || !lastGenTime) {
+        needRegeneration := true
+        LogToFile("TIME-BASED REGENERATION TRIGGERED - Last generated " . timeDiff . " minutes ago (threshold: " . regenerationInterval . " minutes)")
+    } else {
+        LogToFile("REGENERATION SKIPPED - Lists generated " . timeDiff . " minutes ago (threshold: " . regenerationInterval . " minutes)")
+        return  ; Exit the function early, no need to regenerate
     }
     
     ; If we don't need to regenerate, exit the function
     if (!needRegeneration) {
+        LogToFile("=== ACCOUNT LIST GENERATION SKIPPED ===")
         return
     }
     
@@ -4475,8 +4722,8 @@ createAccountList(instance) {
         maxPacks := injectMaxValue + 0  ; Use user-defined max value, force numeric
         LogToFile("Inject mode: Using max value " . injectMaxValue . " (range: 0-" . injectMaxValue . ")")
     }
-else if (deleteMethod = "Inject Missions") {
-    parseInjectType := "Inject Missions"
+    else if (deleteMethod = "Inject Missions") {
+        parseInjectType := "Inject Missions"
         minPacks := 0
         maxPacks := injectMaxValue + 0  ; Use user-defined max value, force numeric
         LogToFile("Inject Missions mode: Using max value " . injectMaxValue . " (range: 0-" . injectMaxValue . ")")
@@ -4526,23 +4773,73 @@ else if (deleteMethod = "Inject Missions") {
     usedAccounts := {}
     if (FileExist(usedAccountsLog)) {
         FileRead, usedAccountsContent, %usedAccountsLog%
+        newUsedContent := ""
+        currentTime := A_Now
+        cleanedCount := 0
+        keptCount := 0
+        
+        LogToFile("Processing used accounts log...")
+        
         Loop, Parse, usedAccountsContent, `n, `r
         {
-            if (A_LoopField) {
+            if (A_LoopField && StrLen(Trim(A_LoopField)) > 0) {
                 parts := StrSplit(A_LoopField, "|")
-                if (parts.Length() >= 1) {
-                    usedAccounts[parts[1]] := 1
+                if (parts.Length() >= 2) {
+                    fileName := Trim(parts[1])
+                    timeUsed := Trim(parts[2])
+                    
+                    ; Skip empty entries
+                    if (!fileName || !timeUsed) {
+                        cleanedCount++
+                        continue
+                    }
+                    
+                    ; Calculate hours since used
+                    timeDiff := currentTime
+                    EnvSub, timeDiff, %timeUsed%, Hours
+                    
+                    ; Keep entries less than 24 hours old (1 day) - matches file eligibility requirement
+                    ; This gives accounts a "cooldown" period before they can be reused
+                    if (timeDiff < 24 && timeDiff >= 0) {
+                        usedAccounts[fileName] := 1
+                        newUsedContent .= fileName . "|" . timeUsed . "`n"
+                        keptCount++
+                        
+                        if (verboseLogging)
+                            LogToFile("  KEPT: " . fileName . " (used " . Round(timeDiff, 1) . " hours ago)")
+                    } else {
+                        cleanedCount++
+                        if (verboseLogging)
+                            LogToFile("  CLEANED: " . fileName . " (used " . Round(timeDiff, 1) . " hours ago)")
+                    }
+                } else {
+                    ; Invalid format - remove it
+                    cleanedCount++
+                    if (verboseLogging)
+                        LogToFile("  CLEANED: Invalid format - " . A_LoopField)
                 }
             }
         }
-        LogToFile("Loaded " . usedAccounts.Count() . " used accounts from log")
+        
+        ; Always rewrite the file to remove cleaned entries
+        FileDelete, %usedAccountsLog%
+        if (newUsedContent)
+            FileAppend, %newUsedContent%, %usedAccountsLog%
+        
+        LogToFile("Used accounts cleanup: " . keptCount . " kept, " . cleanedCount . " cleaned from log (24hr cooldown)")
+    } else {
+        LogToFile("No used accounts log found - starting fresh")
     }
     
     ; Delete existing list files before regenerating
-    if FileExist(outputTxt)
+    if FileExist(outputTxt) {
         FileDelete, %outputTxt%
-    if FileExist(outputTxt_current)
+        LogToFile("Deleted existing list.txt")
+    }
+    if FileExist(outputTxt_current) {
         FileDelete, %outputTxt_current%
+        LogToFile("Deleted existing list_current.txt")
+    }
     
     ; Log current time for debugging
     FormatTime, currentTimeStr, %A_Now%, yyyy-MM-dd HH:mm:ss
@@ -4552,6 +4849,9 @@ else if (deleteMethod = "Inject Missions") {
     fileNames := []
     fileTimes := []
     packCounts := []
+    skippedRecentlyUsed := 0
+    skippedTooYoung := 0
+    skippedOutOfRange := 0
     
     ; First pass: gather all eligible files with their timestamps
     Loop, %saveDir%\*.xml {
@@ -4559,6 +4859,7 @@ else if (deleteMethod = "Inject Missions") {
         
         ; Skip if this account was recently used
         if (usedAccounts.HasKey(A_LoopFileName)) {
+            skippedRecentlyUsed++
             if (verboseLogging)
                 LogToFile("Skipping recently used account: " . A_LoopFileName)
             continue
@@ -4575,6 +4876,7 @@ else if (deleteMethod = "Inject Missions") {
         
         ; Skip files less than 24 hours old
         if (hoursDiff < 24) {
+            skippedTooYoung++
             if (verboseLogging)
                 LogToFile("Skipping account less than 24 hours old: " . A_LoopFileName . " (age: " . hoursDiff . " hours)")
             continue
@@ -4602,6 +4904,7 @@ else if (deleteMethod = "Inject Missions") {
         
         ; Check if pack count fits the current injection range
         if (packCount < minPacks || packCount > maxPacks) {
+            skippedOutOfRange++
             if (verboseLogging)
                 LogToFile("  - SKIPPING: Pack count " . packCount . " outside range " . minPacks . "-" . maxPacks)
             continue
@@ -4615,9 +4918,14 @@ else if (deleteMethod = "Inject Missions") {
             LogToFile("  - KEEPING: Pack count " . packCount . " inside range " . minPacks . "-" . maxPacks)
     }
     
-    ; Log counts
+    ; Log detailed counts
     totalFound := fileNames.MaxIndex() ? fileNames.MaxIndex() : 0
-    LogToFile("Found " . totalFound . " eligible files (>= 24 hours old, not recently used, packs: " . minPacks . "-" . maxPacks . ")")
+    LogToFile("ACCOUNT FILTERING RESULTS:")
+    LogToFile("  - Total eligible: " . totalFound)
+    LogToFile("  - Skipped (recently used): " . skippedRecentlyUsed)
+    LogToFile("  - Skipped (too young): " . skippedTooYoung)
+    LogToFile("  - Skipped (out of range): " . skippedOutOfRange)
+    LogToFile("Filter criteria: >= 24 hours old, not recently used, packs: " . minPacks . "-" . maxPacks)
     
     ; Sort files based on selected method (default to oldest modified first)
     if (totalFound > 0) {
@@ -4667,6 +4975,8 @@ else if (deleteMethod = "Inject Missions") {
     ; Create a file that tracks when the list was last regenerated
     FileDelete, % lastGeneratedFile
     FileAppend, % A_Now, % lastGeneratedFile
+    
+    LogToFile("=== ACCOUNT LIST GENERATION COMPLETED ===")
 }
 
 DoWonderPickOnly() {
