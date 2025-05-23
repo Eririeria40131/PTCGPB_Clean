@@ -89,7 +89,7 @@ IniRead, defaultLanguage, %A_ScriptDir%\..\Settings.ini, UserSettings, defaultLa
 IniRead, rowGap, %A_ScriptDir%\..\Settings.ini, UserSettings, rowGap, 100
 IniRead, SelectedMonitorIndex, %A_ScriptDir%\..\Settings.ini, UserSettings, SelectedMonitorIndex, 1
 IniRead, swipeSpeed, %A_ScriptDir%\..\Settings.ini, UserSettings, swipeSpeed, 300
-IniRead, deleteMethod, %A_ScriptDir%\..\Settings.ini, UserSettings, deleteMethod, 3 Pack
+IniRead, deleteMethod, %A_ScriptDir%\..\Settings.ini, UserSettings, deleteMethod, 13 Pack
 IniRead, runMain, %A_ScriptDir%\..\Settings.ini, UserSettings, runMain, 1
 IniRead, Mains, %A_ScriptDir%\..\Settings.ini, UserSettings, Mains, 1
 IniRead, AccountName, %A_ScriptDir%\..\Settings.ini, UserSettings, AccountName, ""
@@ -940,133 +940,220 @@ clearMissionCache() {
 }
 
 RemoveFriends() {
-    global friendIDs, friended
+    global friendIDs, friended, injectMethod, deleteMethod
 
-	if(!friendIDs && friendID = "") {
-		friended := false
-		return false
-	}
-	
-	packsInPool := 0 ; if friends are removed, clear the pool
+    if(!friendIDs && friendID = "") {
+        friended := false
+        return false
+    }
+    
+    packsInPool := 0 ; if friends are removed, clear the pool
 
     failSafe := A_TickCount
     failSafeTime := 0
+    
+    ; Enhanced navigation to Social menu with injection method consideration
     Loop {
         adbClick_wbb(143, 518)
         if(FindOrLoseImage(120, 500, 155, 530, , "Social", 0, failSafeTime))
             break
-        else if(FindOrLoseImage(175, 165, 255, 235, , "Hourglass3", 0)) {
+        
+        ; Handle hourglass tutorial - but skip for injection methods with higher pack counts
+        if(FindOrLoseImage(175, 165, 255, 235, , "Hourglass3", 0)) {
+            ; Skip hourglass tutorial for Inject for Reroll accounts (they likely already completed it)
+            if(deleteMethod = "Inject for Reroll") {
+                LogToFile("Skipping hourglass tutorial for Inject for Reroll account")
+                adbClick_wbb(143, 518) ; Try clicking social again
+                continue
+            }
+            
+            ; Normal hourglass tutorial handling for other accounts
             Delay(3)
-            adbClick_wbb(146, 441) ; 146 440
+            adbClick_wbb(146, 441)
             Delay(3)
             adbClick_wbb(146, 441)
             Delay(3)
             adbClick_wbb(146, 441)
             Delay(3)
 
-            FindImageAndClick(98, 184, 151, 224, , "Hourglass1", 168, 438, 500, 5) ;stop at hourglasses tutorial 2
+            FindImageAndClick(98, 184, 151, 224, , "Hourglass1", 168, 438, 500, 5)
             Delay(1)
-
-            adbClick_wbb(203, 436) ; 203 436
+            adbClick_wbb(203, 436)
         }
+        
         Sleep, 500
         failSafeTime := (A_TickCount - failSafe) // 1000
         CreateStatusMessage("Waiting for Social`n(" . failSafeTime . "/90 seconds)")
+        
+        if (failSafeTime > 90) {
+            LogToFile("RemoveFriends: Timeout waiting for Social menu - attempting restart")
+            restartGameInstance("Stuck waiting for Social menu in RemoveFriends")
+            return false
+        }
     }
+    
+    ; Navigate to Add Friends section
     FindImageAndClick(226, 100, 270, 135, , "Add", 38, 460, 500)
     FindImageAndClick(205, 430, 255, 475, , "Search", 240, 120, 1500)
     FindImageAndClick(0, 475, 25, 495, , "OK2", 138, 454)
+    
+    ; Handle single friend ID vs multiple friend IDs
     if(!friendIDs) {
-        failSafe := A_TickCount
-        failSafeTime := 0
-        Loop {
-            adbInput(FriendID)
-            Delay(1)
-            if(FindOrLoseImage(205, 430, 255, 475, , "Search", 0, failSafeTime)) {
-                FindImageAndClick(0, 475, 25, 495, , "OK2", 138, 454)
-                EraseInput(1,1)
-            } else if(FindOrLoseImage(205, 430, 255, 475, , "Search2", 0, failSafeTime)) {
-                break
-            }
-            failSafeTime := (A_TickCount - failSafe) // 1000
-            CreateStatusMessage("Waiting for AddFriends1`n(" . failSafeTime . "/45 seconds)")
-        }
-        failSafe := A_TickCount
-        failSafeTime := 0
-        Loop {
-            adbClick_wbb(232, 453)
-            if(FindOrLoseImage(165, 250, 190, 275, , "Send", 0, failSafeTime)) {
-                break
-            } else if(FindOrLoseImage(165, 250, 190, 275, , "Accepted", 0, failSafeTime)) {
-                FindImageAndClick(135, 355, 160, 385, , "Remove", 193, 258, 500)
-                FindImageAndClick(165, 250, 190, 275, , "Send", 200, 372, 2000)
-                break
-            } else if(FindOrLoseImage(165, 240, 255, 270, , "Withdraw", 0, failSafeTime)) {
-                FindImageAndClick(165, 250, 190, 275, , "Send", 243, 258, 2000)
-                break
-            }
-            Sleep, 750
-            failSafeTime := (A_TickCount - failSafe) // 1000
-            CreateStatusMessage("Waiting for AddFriends2`n(" . failSafeTime . "/45 seconds)")
-        }
-        n := 1 ;how many friends added needed to return number for remove friends
+        ; Single friend removal logic
+        RemoveSingleFriend(FriendID)
+        n := 1
     } else {
-        ;randomize friend id list to not back up mains if running in groups since they'll be sent in a random order.
-        n := friendIDs.MaxIndex()
-        Loop % n
-        {
-            i := n - A_Index + 1
-            Random, j, 1, %i%
-            ; Force string assignment with quotes
-            temp := friendIDs[i] . ""  ; Concatenation ensures string type
-            friendIDs[i] := friendIDs[j] . ""
-            friendIDs[j] := temp . ""
+        ; Multiple friends removal logic
+        n := RemoveMultipleFriends()
+    }
+    
+    ; Navigate back to home
+    FindImageAndClick(120, 500, 155, 530, , "Social", 143, 518, 500)
+    
+    ; Handle showcase likes if configured
+    HandleShowcaseLikes()
+    
+    FindImageAndClick(20, 500, 55, 530, , "Home", 40, 516, 500)
+    
+    friended := false
+    return n
+}
+
+RemoveSingleFriend(friendID) {
+    failSafe := A_TickCount
+    failSafeTime := 0
+    Loop {
+        adbInput(friendID)
+        Delay(1)
+        if(FindOrLoseImage(205, 430, 255, 475, , "Search", 0, failSafeTime)) {
+            FindImageAndClick(0, 475, 25, 495, , "OK2", 138, 454)
+            EraseInput(1,1)
+        } else if(FindOrLoseImage(205, 430, 255, 475, , "Search2", 0, failSafeTime)) {
+            break
         }
-        for index, value in friendIDs {
-            if (StrLen(value) != 16) {
-                ; Wrong id value
-                continue
-            }
-            failSafe := A_TickCount
-            failSafeTime := 0
-            Loop {
-                adbInput(value)
-                Delay(1)
-                if(FindOrLoseImage(205, 430, 255, 475, , "Search", 0, failSafeTime)) {
-                    FindImageAndClick(0, 475, 25, 495, , "OK2", 138, 454)
-                    EraseInput()
-                } else if(FindOrLoseImage(205, 430, 255, 475, , "Search2", 0, failSafeTime)) {
-                    break
-                }
-                failSafeTime := (A_TickCount - failSafe) // 1000
-                CreateStatusMessage("Waiting for AddFriends3`n(" . failSafeTime . "/45 seconds)")
-            }
-            failSafe := A_TickCount
-            failSafeTime := 0
-            Loop {
-                adbClick_wbb(232, 453)
-                if(FindOrLoseImage(165, 250, 190, 275, , "Send", 0, failSafeTime)) {
-                    break
-                } else if(FindOrLoseImage(165, 250, 190, 275, , "Accepted", 0, failSafeTime)) {
-                    FindImageAndClick(135, 355, 160, 385, , "Remove", 193, 258, 500)
-                    FindImageAndClick(165, 250, 190, 275, , "Send", 200, 372, 500)
-                    break
-                } else if(FindOrLoseImage(165, 240, 255, 270, , "Withdraw", 0, failSafeTime)) {
-                    FindImageAndClick(165, 250, 190, 275, , "Send", 243, 258, 2000)
-                    break
-                }
-                Sleep, 750
-                failSafeTime := (A_TickCount - failSafe) // 1000
-                CreateStatusMessage("Waiting for AddFriends4`n(" . failSafeTime . "/45 seconds)")
-            }
-            if(index != friendIDs.maxIndex()) {
-                FindImageAndClick(205, 430, 255, 475, , "Search2", 150, 50, 1500)
-                FindImageAndClick(0, 475, 25, 495, , "OK2", 138, 454)
-                EraseInput(index, n)
-            }
+        failSafeTime := (A_TickCount - failSafe) // 1000
+        CreateStatusMessage("Waiting for friend search`n(" . failSafeTime . "/45 seconds)")
+        
+        if (failSafeTime > 45) {
+            LogToFile("RemoveSingleFriend: Timeout during friend search")
+            return false
         }
     }
-    friended := false
+    
+    ; Remove the friend
+    ProcessFriendRemoval()
+}
+
+RemoveMultipleFriends() {
+    ; Randomize friend ID list
+    n := friendIDs.MaxIndex()
+    Loop % n {
+        i := n - A_Index + 1
+        Random, j, 1, %i%
+        temp := friendIDs[i] . ""
+        friendIDs[i] := friendIDs[j] . ""
+        friendIDs[j] := temp . ""
+    }
+    
+    for index, value in friendIDs {
+        if (StrLen(value) != 16) {
+            continue ; Skip invalid IDs
+        }
+        
+        ; Search for friend
+        SearchForFriend(value)
+        
+        ; Remove the friend
+        ProcessFriendRemoval()
+        
+        ; Navigate to next search if not the last friend
+        if(index != friendIDs.maxIndex()) {
+            FindImageAndClick(205, 430, 255, 475, , "Search2", 150, 50, 1500)
+            FindImageAndClick(0, 475, 25, 495, , "OK2", 138, 454)
+            EraseInput(index, n)
+        }
+    }
+    
+    return n
+}
+
+SearchForFriend(friendID) {
+    failSafe := A_TickCount
+    failSafeTime := 0
+    Loop {
+        adbInput(friendID)
+        Delay(1)
+        if(FindOrLoseImage(205, 430, 255, 475, , "Search", 0, failSafeTime)) {
+            FindImageAndClick(0, 475, 25, 495, , "OK2", 138, 454)
+            EraseInput()
+        } else if(FindOrLoseImage(205, 430, 255, 475, , "Search2", 0, failSafeTime)) {
+            break
+        }
+        failSafeTime := (A_TickCount - failSafe) // 1000
+        CreateStatusMessage("Searching for friend`n(" . failSafeTime . "/45 seconds)")
+        
+        if (failSafeTime > 45) {
+            LogToFile("SearchForFriend: Timeout searching for friend: " . friendID)
+            return false
+        }
+    }
+    return true
+}
+
+ProcessFriendRemoval() {
+    failSafe := A_TickCount
+    failSafeTime := 0
+    Loop {
+        adbClick_wbb(232, 453)
+        if(FindOrLoseImage(165, 250, 190, 275, , "Send", 0, failSafeTime)) {
+            break
+        } else if(FindOrLoseImage(165, 250, 190, 275, , "Accepted", 0, failSafeTime)) {
+            FindImageAndClick(135, 355, 160, 385, , "Remove", 193, 258, 500)
+            FindImageAndClick(165, 250, 190, 275, , "Send", 200, 372, 2000)
+            break
+        } else if(FindOrLoseImage(165, 240, 255, 270, , "Withdraw", 0, failSafeTime)) {
+            FindImageAndClick(165, 250, 190, 275, , "Send", 243, 258, 2000)
+            break
+        }
+        Sleep, 750
+        failSafeTime := (A_TickCount - failSafe) // 1000
+        CreateStatusMessage("Processing friend removal`n(" . failSafeTime . "/45 seconds)")
+        
+        if (failSafeTime > 45) {
+            LogToFile("ProcessFriendRemoval: Timeout during friend removal")
+            return false
+        }
+    }
+}
+
+HandleShowcaseLikes() {
+    IniRead, showcaseNumber, %A_ScriptDir%\..\Settings.ini, UserSettings, showcaseLikes, 1
+    if (showcaseNumber > 0) {
+        showcaseNumber -= 1
+        IniWrite, %showcaseNumber%, %A_ScriptDir%\..\Settings.ini, UserSettings, showcaseLikes
+        Delay(5)
+        
+        ; Showcase liking logic
+        adbClick_wbb(80, 400)
+        Delay(10)
+        
+        Loop, Read, %A_ScriptDir%\..\showcase_ids.txt
+        {
+            showcaseID := Trim(A_LoopReadLine)
+            adbClick_wbb(220, 467)
+            Delay(3)
+            adbClick_wbb(152, 272)
+            Delay(3)
+            adbInput(showcaseID)
+            Delay(1)
+            adbClick_wbb(212, 384)
+            Delay(3)
+            adbClick_wbb(133, 192)
+            Delay(3)
+            adbClick_wbb(133, 492)
+            Delay(3)
+        }
+    }
 }
 
 TradeTutorial() {
