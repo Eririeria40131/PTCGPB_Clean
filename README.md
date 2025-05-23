@@ -1,6 +1,6 @@
 📌 **Based on:** [Arturo's PTCGPB](https://github.com/Arturo-1212/PTCGPB)
 
-### UI Improvements
+# **UI Improvements**
 
 - Modified the original GUI style  
 - Adopted a design that better matches the game's interface  
