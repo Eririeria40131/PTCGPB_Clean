@@ -2708,10 +2708,14 @@ ControlClick(X, Y) {
 
 DownloadFile(url, filename) {
     url := url  ; Change to your hosted .txt URL "https://pastebin.com/raw/vYxsiqSs"
+    RegRead, proxyEnabled, HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Internet Settings, ProxyEnable
+	RegRead, proxyServer, HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Internet Settings, ProxyServer
     localPath = %A_ScriptDir%\..\%filename% ; Change to the folder you want to save the file
     errored := false
     try {
         whr := ComObjCreate("WinHttp.WinHttpRequest.5.1")
+        if (proxyEnabled)
+			whr.SetProxy(2, proxyServer)
         whr.Open("GET", url, true)
         whr.Send()
         whr.WaitForResponse()
