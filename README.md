@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # **License Change Notice**
 The original intention of this project was not for it to be used for paid services even those disguised as 'donations.'
 
