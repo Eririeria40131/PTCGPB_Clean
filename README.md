@@ -1,3 +1,11 @@
+📌 **Based on:** [Arturo's PTCGPB](https://github.com/Arturo-1212/PTCGPB)
+
+### UI Improvements
+
+- Modified the original GUI style  
+- Adopted a design that better matches the game's interface  
+- Reduced the amount of information displayed on a single page to improve readability
+
 # **License Change Notice**
 The original intention of this project was not for it to be used for paid services even those disguised as 'donations.'
 
