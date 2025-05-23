@@ -127,10 +127,17 @@ LogToDiscord(message, screenshotFile := "", ping := false, xmlFile := "", screen
     if (webhookURL != "") {
         MaxRetries := 10
         RetryCount := 0
+        RegRead, proxyEnabled, HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Internet Settings, ProxyEnable
+        RegRead, proxyServer, HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Internet Settings, ProxyServer
+        if (proxyEnabled) {
+            curlChar := "curl -k -x " . proxyServer . "/ " 
+        } else {
+            curlChar := "curl -k "
+        }        
         Loop {
             try {
                 ; Base command
-                curlCommand := "curl -k "
+                curlCommand := curlChar
                     . "-F ""payload_json={\""content\"":\""" . discordPing . message . "\""};type=application/json;charset=UTF-8"" "
 
                 ; If an screenshot or xml file is provided, send it
