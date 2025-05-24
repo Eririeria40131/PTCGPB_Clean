@@ -133,7 +133,7 @@ LogToDiscord(message, screenshotFile := "", ping := false, xmlFile := "", screen
             curlChar := "curl -k -x " . proxyServer . "/ " 
         } else {
             curlChar := "curl -k "
-        }        
+        }
         Loop {
             try {
                 ; Base command
