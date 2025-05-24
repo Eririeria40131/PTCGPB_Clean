@@ -1,62 +1,49 @@
 ﻿#SingleInstance, force
+#NoEnv
 
-; Define the primary paths
+; Define the primary paths more efficiently
 scriptDir := A_ScriptDir
 saveDir := scriptDir . "\..\Accounts\Saved"
-saveDir := RegExReplace(saveDir, "\\{2,}", "\")
 
-; Verify the directory exists
-if (!InStr(FileExist(saveDir), "D")) {
-    ; Try an alternative approach - go directly to the path without the relative part
-    alternativePath := scriptDir . "\Accounts\Saved"
-    alternativePath := RegExReplace(alternativePath, "\\{2,}", "\")
+; Clean up path efficiently
+saveDir := StrReplace(saveDir, "\\", "\")
+
+; Quick directory existence check with fallback
+if (!FileExist(saveDir)) {
+    ; Try alternative path directly
+    saveDir := scriptDir . "\Accounts\Saved"
+    saveDir := StrReplace(saveDir, "\\", "\")
     
-    if (InStr(FileExist(alternativePath), "D")) {
-        saveDir := alternativePath
-    } else {
+    ; Exit immediately if neither path exists
+    if (!FileExist(saveDir)) {
         ExitApp
     }
 }
 
-; Initialize counters
-totalFilesDeleted := 0
-foldersProcessed := 0
+; Use batch file deletion for maximum speed
+; Create a temporary batch script for bulk deletion
+tempBatchFile := A_Temp . "\reset_lists_" . A_TickCount . ".bat"
 
-; Process each folder
-Loop, %saveDir%\*, 2  ; Loop through folders
-{
-    folderName := A_LoopFileName
-    folder := A_LoopFileFullPath
-    foldersProcessed++
-    
-    ; Define the file paths
-    listFile := folder . "\list.txt"
-    listCurrentFile := folder . "\list_current.txt"
-    lastGenFile := folder . "\list_last_generated.txt"
-    
-    ; Delete list.txt if it exists
-    if (FileExist(listFile)) {
-        FileDelete, %listFile%
-        if (!ErrorLevel) {
-            totalFilesDeleted++
-        }
-    }
-    
-    ; Delete list_current.txt if it exists
-    if (FileExist(listCurrentFile)) {
-        FileDelete, %listCurrentFile%
-        if (!ErrorLevel) {
-            totalFilesDeleted++
-        }
-    }
-    
-    ; Delete list_last_generated.txt if it exists
-    if (FileExist(lastGenFile)) {
-        FileDelete, %lastGenFile%
-        if (!ErrorLevel) {
-            totalFilesDeleted++
-        }
-    }
-}
+; Build the batch commands for ultra-fast deletion
+batchContent := "@echo off`n"
+batchContent .= "cd /d """ . saveDir . """`n"
+
+; Add deletion commands for all possible list files in all subdirectories
+; This processes all folders and files in a single batch operation
+batchContent .= "for /d %%i in (*) do (`n"
+batchContent .= "    if exist ""%%i\list.txt"" del /q ""%%i\list.txt"" 2>nul`n"
+batchContent .= "    if exist ""%%i\list_current.txt"" del /q ""%%i\list_current.txt"" 2>nul`n"
+batchContent .= "    if exist ""%%i\list_last_generated.txt"" del /q ""%%i\list_last_generated.txt"" 2>nul`n"
+batchContent .= ")`n"
+
+; Write the batch file
+FileDelete, %tempBatchFile%
+FileAppend, %batchContent%, %tempBatchFile%
+
+; Execute the batch file and wait for completion
+RunWait, "%tempBatchFile%",, Hide
+
+; Clean up the temporary batch file
+FileDelete, %tempBatchFile%
 
 ExitApp
