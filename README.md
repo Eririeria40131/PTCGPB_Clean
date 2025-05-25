@@ -1,10 +1,11 @@
 📌 **Based on:** [Arturo's PTCGPB](https://github.com/Arturo-1212/PTCGPB)
 
-# **UI Improvements**
+# **GUI Improvements**
 
 - Modified the original GUI style  
 - Adopted a design that better matches the game's interface  
 - Reduced the amount of information displayed on a single page to improve readability
+- Support English, 繁體中文, 日本語
 
 ### Presentation
 
