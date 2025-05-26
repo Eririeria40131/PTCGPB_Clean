@@ -5,7 +5,7 @@
 - Modified the original GUI style  
 - Adopted a design that better matches the game's interface  
 - Reduced the amount of information displayed on a single page to improve readability
-- Support English, 繁體中文, 日本語
+- Support English, 繁體中文, 日本語, Deutsch
 
 ### Presentation
 
