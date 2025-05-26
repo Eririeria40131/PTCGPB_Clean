@@ -35,13 +35,13 @@
         Lang["btn_setting"] := "Settings Page"
         Lang["btn_return"] := "↩️ Return"
 
+        Lang["btn_Language"] := "Language"
+        Lang["languageNotice"] := "PTCGPB.ahk needs to reload in order to switch the language. Click 'Yes' to reload, or 'No' to return to the settings."
         Lang["btn_reload"] := "Reload"
         Lang["btn_bg_Off"] := "Background Off"
         Lang["btn_bg_On"] := "Background On"
         Lang["btn_theme_Dark"] := "Dark"
         Lang["btn_theme_Light"] := "Light"
-
-        Lang["title_set"] := "You can modify settings here."
 
         Lang["FriendIDLabel"] := "Your Friend ID"
         Lang["Txt_Instances"] := "Instances:"
@@ -125,7 +125,8 @@
         Lang["cancel"] := "已取消更新。"
         Lang["up_to_date"] := "你已使用最新版本 (" . localVersion . ")。" 
 
-        Lang["title_set"] := "你可以在這裡修改設定。" ; SettingPage
+        Lang["title_set"] := "在這裡選擇你要修改的設定。" ; SettingPage
+        Lang["languageNotice"] := "切換選言需重啟腳本，是否重啟?"
         Lang["btn_reroll"] := "刷包設定"
         Lang["btn_system"] := "系統設定"
         Lang["btn_pack"] := "卡包設定"
@@ -145,13 +146,12 @@
         Lang["btn_setting"] := "⚙️ 設定頁面"
         Lang["btn_return"] := "↩️ 返回"
 
+        Lang["btn_Language"] := "語言"
         Lang["btn_reload"] := "重啟"
         Lang["btn_bg_Off"] := "背景關閉"
         Lang["btn_bg_On"] := "背景開啟"
         Lang["btn_theme_Dark"] := "深色"
         Lang["btn_theme_Light"] := "淺色"
-
-        Lang["title_set"] := "在這裡選擇要修改的設定"
 
         Lang["FriendIDLabel"] := "你的遊戲ID"
         Lang["Txt_Instances"] := "模擬器數量："
@@ -255,13 +255,13 @@
         Lang["btn_setting"] := "⚙️ 設定ページ"
         Lang["btn_return"] := "↩️ 戻る"
 
+        Lang["btn_Language"] := "言語"
+        Lang["languageNotice"] := "PTCGPB.ahk needs to reload in order to switch the language. Click 'Yes' to reload, or 'No' to return to the settings."
         Lang["btn_reload"] := "リロード"
         Lang["btn_bg_Off"] := "背景オフ"
         Lang["btn_bg_On"] := "背景オン"
         Lang["btn_theme_Dark"] := "ダークモード"
         Lang["btn_theme_Light"] := "ライトモード"
-
-        Lang["title_set"] := "ここで設定を変更できます。"
 
         Lang["FriendIDLabel"] := "メインアカウントID"
         Lang["Txt_Instances"] := "エミュレータ数："
@@ -365,11 +365,14 @@
         Lang["btn_setting"] := "Einstellungen"
         Lang["btn_return"] := "↩️ Zurück"
 
+        Lang["btn_Language"] := "Sprache"
+        Lang["languageNotice"] := "PTCGPB.ahk needs to reload in order to switch the language. Click 'Yes' to reload, or 'No' to return to the settings."
         Lang["btn_reload"] := "Neu laden"
         Lang["btn_bg_Off"] := "Hintergrund aus"
         Lang["btn_bg_On"] := "Hintergrund an"
         Lang["btn_theme_Dark"] := "Dunkel"
         Lang["btn_theme_Light"] := "Hell"
+
         Lang["FriendIDLabel"] := "Deine Freundes-ID"
         Lang["Txt_Instances"] := "Instanzen:"
         Lang["Txt_InstanceStartDelay"] := "Startverzögerung:"
@@ -439,6 +442,38 @@
         Lang["Txt_showcaseEnabled"] := "Showcase aus showcase_ids.txt verwenden"
     }  
     return Lang
+}
+
+CreateLicenseNoteLanguage(Language) {
+    LicenseLang := Object()
+    if (Language = 1) {
+        LicenseLang["Title"] := "The project is now licensed under CC BY-NC 4.0"
+        LicenseLang["Content"] :=  "The original intention of this project was not for it to be used for paid services even those disguised as 'donations.' I hope people respect my wishes and those of the community.`nThe project is now licensed under CC BY-NC 4.0, which allows you to use, modify, and share the software only for non-commercial purposes. Commercial use, including using the software to provide paid services or selling it (even if donations are involved), is not allowed under this license. The new license applies to this and all future releases."
+    } else if (Language = 2) {
+        LicenseLang["Title"] := "本專案現已採用 CC BY-NC 4.0 授權"
+        LicenseLang["Content"] := "本專案的初衷並非用於任何形式的付費服務，即使這些服務以「斗內」的名義包裝也不例外。我希望大家能尊重我與社群的意願。 本授權允許您在非商業用途下使用、修改與分享本軟體。 任何商業用途（包括使用本軟體提供付費服務或銷售，即使是透過斗內方式），在此授權條款下皆不被允許。 新授權條款適用於本版本以及所有未來版本。"
+    } else if (Language = 3) {
+        LicenseLang["Title"] := "このプロジェクトは現在、CC BY-NC 4.0 ライセンスの下で提供されています"
+        LicenseLang["Content"] := "本プロジェクトの本来の意図は、有償サービス（「寄付」と偽装されたものを含む）で使用されることではありません。私およびコミュニティの意志を尊重していただけることを願っています。現在適用されている CC BY-NC 4.0 ライセンスでは、非営利目的に限り、ソフトウェアの使用・改変・共有が可能です。営利目的での利用、たとえば有償サービスの提供や販売（寄付を含む）などは、このライセンスのもとでは許可されていません。この新しいライセンスは、本リリースおよび今後のすべてのリリースに適用されます。"
+    } else if (Language = 4) {
+        LicenseLang["Title"] := "Dieses Projekt ist lizensiert unter CC BY-NC 4.0"
+        LicenseLang["Content"] := "Die ursprüngliche Absicht dieses Projekts war nicht, dass es für bezahlte Dienste genutzt wird – auch nicht in Form angeblicher 'Spenden'. Ich hoffe, dass die Leute meine Wünsche und die der Community respektieren.`nDas Projekt steht nun unter der Lizenz CC BY-NC 4.0. Diese erlaubt die Nutzung, Modifikation und Weitergabe der Software ausschließlich für nicht-kommerzielle Zwecke. Kommerzielle Nutzung – einschließlich bezahlter Dienste oder Verkäufe (auch mit Spenden) – ist unter dieser Lizenz nicht gestattet. Die neue Lizenz gilt für diese und alle zukünftigen Versionen."
+    }
+    return LicenseLang
+}
+
+CreateProxyLanguage(Language) {
+        ProxyLang := Object()
+    if (Language = 1) {
+        ProxyLang["Notice"] := "Proxy detected. Switched to proxy version." 
+    } else if (Language = 2) {
+        ProxyLang["Notice"] := "偵測到代理，已切換至代理版本。" 
+    } else if (Language = 3) {
+        ProxyLang["Notice"] := "プロキシを検出しました。プロキシ版に切り替えました。"
+    } else if (Language = 4) {
+        ProxyLang["Notice"] := "Proxy erkannt. Wechsle zur Proxy-Version."
+    }
+    return ProxyLang
 }
 
 CreateSetUpByLanguage(Language) {
@@ -522,19 +557,19 @@ CreateSetUpByLanguage(Language) {
         SetUpLang["Confirm_RowGap"] := "行間隔："
         SetUpLang["Confirm_StartBot"] := "「はい」でこの設定でBOTを開始。「いいえ」で設定を変更します。"
     } else if (Language = 4) {
-        SetUpLang["Error_BotPathTooLong"] := "Der Pfad zum Bot-Ordner ist zu lang oder enthält Leerzeichen. Bitte verschieben Sie den Ordner in ein Verzeichnis mit einem kürzeren Pfad und ohne Leerzeichen."
-        SetUpLang["Confirm_SelectedMethod"] := "Ausgewählte Methode: "
-        SetUpLang["Confirm_RangeValue"] := "Bereichswert: "
+        SetUpLang["Error_BotPathTooLong"] := "Der Pfad zum Bot-Ordner ist zu lang oder enthält Leerzeichen. Bitte verschiebe ihn in ein kürzeres Verzeichnis ohne Leerzeichen."
+        SetUpLang["Confirm_SelectedMethod"] := "Gewählte Methode: "
+        SetUpLang["Confirm_RangeValue"] := "Wertbereich: "
         SetUpLang["Confirm_MaxPackCount"] := "Maximale Paketanzahl: "
         SetUpLang["Confirm_MinPackCount"] := "Mindestpackungsanzahl: "
-        SetUpLang["Confirm_SelectedPacks"] := "Ausgewählte Pakete: "
-        SetUpLang["Confirm_AdditionalSettings"] := "Zusätzliche Einstellungen: "
-        SetUpLang["Confirm_1PackMethod"] := "• 1 Pack Methode"
-        SetUpLang["Confirm_MenuDelete"] := "• Account löschen"
+        SetUpLang["Confirm_SelectedPacks"] := "Gewählte Packs: "
+        SetUpLang["Confirm_AdditionalSettings"] := "Weitere Einstellungen: "
+        SetUpLang["Confirm_1PackMethod"] := "• 1-Pack Methode"
+        SetUpLang["Confirm_MenuDelete"] := "• Menü löschen"
         SetUpLang["Confirm_SpendHourGlass"] := "• Sanduhren verwenden"
         SetUpLang["Confirm_ClaimMissions"] := "• Spezialmissionen einfordern"
         SetUpLang["Confirm_SortBy"] := "• Sortieren nach: "
-        SetUpLang["Confirm_None"] := "None"
+        SetUpLang["Confirm_None"] := "Keine"
         SetUpLang["Confirm_CardDetection"] := "Kartenerkennung: "
         SetUpLang["Confirm_SingleFullArt"] := "• Einzelne Full Art"
         SetUpLang["Confirm_SingleTrainer"] := "• Einzelne Trainer"
@@ -546,7 +581,7 @@ CreateSetUpByLanguage(Language) {
         SetUpLang["Confirm_OnlyShinyPacks"] := "• Nur schillernde Packs"
         SetUpLang["Confirm_IgnoreInvalid"] := "• Ignoriere ungültige Packs"
         SetUpLang["Confirm_RowGap"] := "Abstand zw. Instanzen: "
-        SetUpLang["Confirm_StartBot"] := "Klicken Sie auf „Ja“, um den Bot mit diesen Einstellungen zu starten. Klicken Sie auf „Nein“, um die Einstellungen zu ändern."
+        SetUpLang["Confirm_StartBot"] := "Klicke auf „Ja“, um den BOT mit diesen Einstellungen zu STARTEN. Klicke auf „Nein“, um die Einstellungen zu ÄNDERN."
     }
     return SetUPLang
 }
@@ -602,4 +637,207 @@ CreateHelpByLanguage(Language) {
         HelpLang["Help_ToggleBG"] := "Hintergrundbild mit dem BG-Button ein-/ausschalten."
     }
     return HelpLang
+}
+
+PageBtnShift(Language) {
+    global
+    xs_TitleSet := 0
+    xs_Reroll := 0
+    xs_System := 0
+    xs_Pack := 0
+    xs_Trade := 0
+    xs_Discord := 0
+    xs_Download := 0
+    xs_MainPage := 0    
+    ys := 0
+
+    xs_Arrange := 0
+    xs_Coffee := 0
+    xs_Join := 0    
+    xs_Launch := 0    
+    xs_Balance := 0    
+    xs_Start := 0    
+    xs_Update := 0
+    xs_SettingPage := 0
+    ys_SettingPage := 0
+
+    xs_Return := 0
+    ys_Return := 0   
+
+    xs_Background := 0
+    xs_Reload := 0
+    xs_Theme := 0
+    xs_Language := 0
+    ys_Background := 0    
+    ys_Theme := 0    
+    ys_Reload := 0
+    ys_Language := 0
+    if (defaultBotLanguage = 1) {
+        xs_TitleSet := 10
+        xs_Reroll := 0
+        xs_System := 0
+        xs_Pack := 0
+        xs_Trade := 0
+        xs_Discord := 0
+        xs_Download := 0
+        xs_MainPage := 0    
+        ys := 0
+
+        xs_Arrange := 0
+        xs_Coffee := 0
+        xs_Join := 0    
+        xs_Launch := 0    
+        xs_Balance := 0    
+        xs_Start := 0    
+        xs_Update := 0
+        xs_SettingPage := 0
+        ys_SettingPage := 0
+
+        xs_Return := 0
+        ys_Return := 0   
+        
+        xs_Background := 0
+        xs_Reload := 0
+        xs_Theme := 0
+        ys_Background := 0    
+        ys_Theme := 0    
+        ys_Reload := 0
+    } else if (defaultBotLanguage = 2) {
+        xs_TitleSet := 10
+        xs_Reroll := 26
+        xs_System := 32
+        xs_Pack := 22
+        xs_Trade := 25
+        xs_Discord := 22
+        xs_Download := 42
+        xs_MainPage := 6
+        ys := 2
+
+        xs_Arrange := 37
+        xs_Coffee := 12
+        xs_Join := 4
+        xs_Launch := 4
+        xs_Balance := 6
+        xs_Start := 5
+        xs_Update := 32
+        xs_SettingPage := 12
+        ys_SettingPage := 3
+
+        xs_Return := 26
+        ys_Return := 4
+    
+        xs_Background := 20
+        xs_Reload := 20
+        xs_Theme := 0
+        xs_Language := 40
+        ys_Background := 1
+        ys_Theme := 1
+        ys_Reload := 1
+        ys_Language := 1
+    } else if (defaultBotLanguage = 3) {
+        xs_TitleSet := 10
+        xs_Reroll := 11
+        xs_System := 18
+        xs_Pack := 15
+        xs_Trade := 11
+        xs_Discord := 22
+        xs_Download := 12
+        xs_MainPage := -14
+        ys := 2
+
+        xs_Arrange := 10
+        xs_Coffee := 12
+        xs_Join := 0
+        xs_Launch := -27
+        xs_Balance := -7
+        xs_Start := -8
+        xs_Update := 27
+        xs_SettingPage := 8
+        ys_SettingPage := 3
+
+        xs_Return := 26
+        ys_Return := 4
+    
+        xs_Background := -2
+        xs_Reload := -12
+        xs_Theme := -37
+        xs_Language := 18
+        ys_Background := 0
+        ys_Theme := 0
+        ys_Reload := 0
+    } else if (defaultBotLanguage := 4) {
+        xs_TitleSet := 0
+        xs_Reroll := -15
+        xs_System := -15
+        xs_Pack := -15
+        xs_Trade := -15
+        xs_Discord := -15
+        xs_Download := -15
+        xs_MainPage := 4    
+        ys := 0
+
+        xs_Arrange := 0
+        xs_Coffee := -40
+        xs_Join := -20   
+        xs_Launch := -15    
+        xs_Balance := -15    
+        xs_Start := -5    
+        xs_Update := -20
+        xs_SettingPage := 0
+        ys_SettingPage := 0
+
+        xs_Return := 0
+        ys_Return := 0   
+
+        xs_Background := 2
+        xs_Reload := -10
+        xs_Theme := 0
+        ys_Background := 0   
+        ys_Theme := 0    
+        ys_Reload := 0
+    }
+}
+
+PackControlsShift(Language) {
+    global
+    xs_Min2star := 0
+    xs_MinShing := 0
+    xs_Hourglass := 0
+    xs_Solgaleo := 0
+    xs_Lunala := 0
+    xs_Shining := 0
+    xs_Arceus := 0
+    xs_Palkia := 0
+    xs_Dialga := 0
+    xs_Pikachu := 0
+    xs_Charizard := 0
+    xs_Mewtwo := 0
+    xs_Mew := 0
+    xs_SpecialCheck := 0
+    xs_Sort := 0
+    xs_SaveCrown := 0
+    xs_SaveShing := 0
+    xs_SaveImmer := 0
+    xs_invalid := 0
+    if (defaultBotLanguage = 3) {
+        xs_Solgaleo := -4
+        xs_Lunala := -4
+        xs_Shining := -4
+        xs_Arceus := -4
+        xs_Palkia := -4
+        xs_Dialga := -4
+        xs_Pikachu := -4
+        xs_Charizard := -4
+        xs_Mewtwo := -4
+        xs_Mew := -4
+    } else if (defaultBotLanguage = 4) {
+        xs_Min2star := -10
+        xs_MinShing := -20
+        xs_SpecialCheck := 20
+        xs_Sort := 20
+        xs_SaveCrown := 10
+        xs_SaveShing := 10
+        xs_SaveImmer := 10
+        xs_invalid := -10
+    }
 }
