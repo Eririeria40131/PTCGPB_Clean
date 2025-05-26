@@ -1,4 +1,4 @@
-CreateGUITextByLanguage(Language, localVersion) {
+﻿CreateGUITextByLanguage(Language, localVersion) {
     Lang := Object()
     if (Language = 1) {
         Lang["fail_fetch"] := "Failed to fetch release info." ; checkForUpdate
