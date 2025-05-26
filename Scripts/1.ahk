@@ -178,8 +178,7 @@ changeDate := getChangeDateTime() ; get server reset time
 if(heartBeat)
     IniWrite, 1, %A_ScriptDir%\..\HeartBeat.ini, HeartBeat, Instance%scriptName%
 
-SetTimer, RefreshAccountLists, 3600000  ; 3,600,000 ms = 1 hour
-SetTimer, CleanupUsedAccountsTimer, 1800000  ; Clean every 30 minutes (1,800,000 ms)
+SetTimer, RefreshAccountLists, 3600000  ; Refresh Account list every hour
 
 ; Set default rowGap if not defined
 if (!rowGap)
@@ -287,8 +286,6 @@ adbSwipeX2 := Round(267 / 277 * 535)
 adbSwipeY := Round((327 - 44) / 489 * 960)
 global adbSwipeParams := adbSwipeX1 . " " . adbSwipeY . " " . adbSwipeX2 . " " . adbSwipeY . " " . swipeSpeed
 
-; ===== COMPLETE MAIN LOOP SECTION =====
-
 if(DeadCheck = 1){
     IniWrite, 0, %A_ScriptDir%\%scriptName%.ini, UserSettings, DeadCheck
 }
@@ -348,7 +345,6 @@ if(DeadCheck = 1 && !injectMethod){
             createAccountList(scriptName)
         }
 
-        ; ===== CRITICAL INJECTION LOGIC FIX =====
         ; For injection methods, load account only if we don't already have one
         if(injectMethod) {
             nukeAccount := false
@@ -650,29 +646,18 @@ if(DeadCheck = 1 && !injectMethod){
 
         AppendToJsonFile(packsThisRun)
 
-        ; BallCity 2025.02.21 - Keep track of additional metrics
-        now := A_NowUTC
-        IniWrite, %now%, %A_ScriptDir%\%scriptName%.ini, Metrics, LastEndTimeUTC
-        EnvSub, now, 1970, seconds
-        IniWrite, %now%, %A_ScriptDir%\%scriptName%.ini, Metrics, LastEndEpoch
-
-        rerolls++
-        IniWrite, %rerolls%, %A_ScriptDir%\%scriptName%.ini, Metrics, rerolls
-
-        totalSeconds := Round((A_TickCount - rerollStartTime) / 1000) ; Total time in seconds
-        avgtotalSeconds := Round(totalSeconds / rerolls) ; Average time per run in seconds
-        aminutes := Floor(avgtotalSeconds / 60) ; Average minutes
-        aseconds := Mod(avgtotalSeconds, 60) ; Average remaining seconds
-        mminutes := Floor(totalSeconds / 60) ; Total minutes
-        sseconds := Mod(totalSeconds, 60) ; Total remaining seconds
-
-        ; Display the times
-        CreateStatusMessage("Avg: " . aminutes . "m " . aseconds . "s | Runs: " . rerolls . " | Account Packs " . accountOpenPacks, "AvgRuns", 0, 605, false, true)
-
-        ; Log to file
-        LogToFile("Packs: " . packsThisRun . " | Total time: " . mminutes . "m " . sseconds . "s | Avg: " . aminutes . "m " . aseconds . "s | Runs: " . rerolls)
-
         ; ===== ACCOUNT MANAGEMENT AT END OF RUN =====
+        if (deleteMethod = "Inject Missions" && accountOpenPacks >= maxAccountPackNum) {
+            if (injectMethod && loadedAccount) {
+                if (!keepAccount) {
+                    MarkAccountAsUsed() 
+                    LogToFile("Marked injected account as used: " . accountFileName)
+                }
+                loadedAccount := false
+                continue
+            }
+        }
+        
         if (injectMethod && loadedAccount) {
             ; For injection methods, mark the account as used
             if (!keepAccount) {
@@ -711,16 +696,8 @@ if(DeadCheck = 1 && !injectMethod){
             CreateStatusMessage("Stopping...",,,, false)
             ExitApp
         }
-        
-        ; Continue to next iteration of main loop
-        if (stopToggle) {
-            CreateStatusMessage("Stopping...",,,, false)
-            ExitApp
-        }
     }
 }
-
-; ===== END OF MAIN LOOP SECTION - REPLACE TO HERE =====
 
 return
 
@@ -1663,7 +1640,7 @@ DirectlyPositionWindow() {
 restartGameInstance(reason, RL := true) {
     global friended, scriptName, packsThisRun, injectMethod, loadedAccount, DeadCheck, starCount, packsInPool, openPack, invalid, accountFile, username, stopToggle
 	
-	Screenshot("restartGameInstance")
+	;Screenshot("restartGameInstance")
 
     if (Debug)
         CreateStatusMessage("Restarting game reason:`n" . reason)
@@ -1930,9 +1907,9 @@ CheckPack() {
 
 if (foundGP) {
     if (loadedAccount) {
-        accountFoundGP()
-        accountHasPackInTesting := 1  ; Add this line
-        setMetaData()                  ; Add this line
+        ;accountFoundGP()
+        accountHasPackInTesting := 1 
+        setMetaData()               
         IniWrite, 0, %A_ScriptDir%\%scriptName%.ini, UserSettings, DeadCheck
     }
 
@@ -1976,7 +1953,9 @@ if (foundGP) {
 
         if (foundLabel) {
             if (loadedAccount) {
-                accountFoundGP()
+                ;accountFoundGP()
+                accountHasPackInTesting := 1
+                setMetaData()
                 IniWrite, 0, %A_ScriptDir%\%scriptName%.ini, UserSettings, DeadCheck
             }
 
@@ -2389,11 +2368,8 @@ GodPackFound(validity) {
     }
 }
 
-; OPTIMIZED loadAccount() function - Faster account loading
+
 loadAccount() {
-    global beginnerMissionsDone, soloBattleMissionDone, intermediateMissionsDone, specialMissionsDone, resetSpecialMissionsDone
-    global stopToggle, scriptName, accountFileName, accountOpenPacks, accountFileNameTmp, accountFileNameOrig, accountHasPackInfo
-    global currentLoadedAccountIndex
 
     beginnerMissionsDone := 0
     soloBattleMissionDone := 0
@@ -2451,6 +2427,18 @@ loadAccount() {
                     LogToFile("Loading account from pre-filtered list: " . accountFileName)
                     break
                 }
+
+				if(InStr(fileLines[1], "T")) {
+					; account has a pack under test
+					
+				}
+				if (accountModifiedTimeDiff >= 24){
+					if(!InStr(fileLines[1], "T") || accountModifiedTimeDiff >= 5*24) {
+						; otherwise account has a pack under test
+						accountFileName := fileLines[1]
+						break
+					}
+				}
                 
                 if (foundValidAccount)
                     break
@@ -2558,6 +2546,8 @@ saveAccount(file := "Valid", ByRef filePath := "", packDetails := "") {
 			metadata .= "I"
 		if(specialMissionsDone)
 			metadata .= "X"
+        if(accountHasPackInTesting)
+            metadata .= "T"
 			
         saveDir := A_ScriptDir "\..\Accounts\Saved\" . winTitle
         filePath := saveDir . "\" . accountOpenPacks . "P_" . A_Now . "_" . winTitle . "(" . metadata . ").xml"
@@ -2614,6 +2604,7 @@ saveAccount(file := "Valid", ByRef filePath := "", packDetails := "") {
     return xmlFile
 }
 
+/* ;Deprecated, use T flag instead
 accountFoundGP() {
 	saveDir := A_ScriptDir "\..\Accounts\Saved\" . winTitle
 	accountFile := saveDir . "\" . accountFileName
@@ -2623,6 +2614,7 @@ accountFoundGP() {
 	
 	FileSetTime, accountFileTime, %accountFile%
 }
+*/
 
 ; MODIFIED TrackUsedAccount function with better timestamp tracking
 TrackUsedAccount(fileName) {
@@ -2732,10 +2724,15 @@ ControlClick(X, Y) {
 
 DownloadFile(url, filename) {
     url := url  ; Change to your hosted .txt URL "https://pastebin.com/raw/vYxsiqSs"
+    RegRead, proxyEnabled, HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Internet Settings, ProxyEnable
+    RegRead, proxyServer, HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Internet Settings, ProxyServer
     localPath = %A_ScriptDir%\..\%filename% ; Change to the folder you want to save the file
     errored := false
     try {
         whr := ComObjCreate("WinHttp.WinHttpRequest.5.1")
+        if (proxyEnabled) {
+            whr.SetProxy(2, proxyServer)
+        }
         whr.Open("GET", url, true)
         whr.Send()
         whr.WaitForResponse()
@@ -4739,23 +4736,14 @@ getMetaData() {
                 intermediateMissionsDone := 1
             if(InStr(metadata, "X"))
                 specialMissionsDone := 1
-            
-            ; Check if T flag exists and if it should be removed based on file age
             if(InStr(metadata, "T")) {
-                ; Get file creation time
                 saveDir := A_ScriptDir "\..\Accounts\Saved\" . winTitle
                 accountFile := saveDir . "\" . accountFileName
                 FileGetTime, fileTime, %accountFile%, M  ; M for modification time
-                
-                ; Calculate hours difference
                 EnvSub, fileTime, %A_Now%, hours
                 hoursDiff := Abs(fileTime)
-                
-                ; If file is older than 5 days (120 hours), don't set the flag
-                ; This will cause it to be removed in setMetaData
                 if(hoursDiff >= 5*24) {
                     accountHasPackInTesting := 0
-                    ; Remove T flag and update the file immediately
                     setMetaData()
                 } else {
                     accountHasPackInTesting := 1
@@ -4796,11 +4784,11 @@ setMetaData() {
         metadata .= "I"
     if(specialMissionsDone)
         metadata .= "X"
-    if(accountHasPackInTesting)      ; Add this line
-        metadata .= "T"               ; Add this line
+    if(accountHasPackInTesting)
+        metadata .= "T"
     
+    ; Remove parentheses if no flags remain, helpful if there is only a T flag or manual removal of X flag
     if(hasMetaData) {
-        ; If there are no flags remaining, remove the parentheses
         if (metadata = "") {
             AccountNewName := NamePartLeftOfMeta . NamePartRightOfMeta
         } else {
@@ -4808,14 +4796,15 @@ setMetaData() {
         }
     } else {
         if (metadata = "") {
-            ; If no metadata to add, just keep the original filename
-            NameAndExtension := StrSplit(accountFileName, ".")  ; Split the extension
+            NameAndExtension := StrSplit(accountFileName, ".")  
             AccountNewName := NameAndExtension[1] . ".xml"
         } else {
-            NameAndExtension := StrSplit(accountFileName, ".")  ; Split the extension
+            NameAndExtension := StrSplit(accountFileName, ".")  
             AccountNewName := NameAndExtension[1] . "(" . metadata . ").xml"
         }
     }
+
+    ;MsgBox, %AccountNewName% ;debug check for filename
     
     saveDir := A_ScriptDir "\..\Accounts\Saved\" . winTitle
     accountFile := saveDir . "\" . accountFileName
@@ -4887,9 +4876,6 @@ GetEventRewards(frommain := true){
     failSafeTime := 0
     Loop{
         Delay(2)
-        ; ADD LEVEL UP CHECK IN REWARD COLLECTION LOOP
-        LevelUp()
-        
         adbClick_wbb(172, 427) ;clicks complete all and ok
         Delay(2)
         adbClick_wbb(152, 464) ;when to many rewards ok button goes lower
