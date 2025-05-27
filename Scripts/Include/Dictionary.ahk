@@ -333,8 +333,8 @@
         Lang["Txt_Charizard"] := "リザードン"
         Lang["Txt_Mewtwo"] := "ミュウツー"
         Lang["Txt_Mew"] := "ミュウ"
-        Lang["AllPack"] := "🔎Show all packs"
-        Lang["PackHeading"] := "Pack Selection"
+        Lang["AllPack"] := "🔎全てのパックを表示"
+        Lang["PackHeading"] := "パック選択"
 
         Lang["Txt_FullArtCheck"] := "単枚フルアート"
         Lang["Txt_TrainerCheck"] := "単枚トレーナー"
