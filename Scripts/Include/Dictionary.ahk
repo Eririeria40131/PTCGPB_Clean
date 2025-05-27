@@ -256,7 +256,7 @@
         Lang["btn_return"] := "↩️ 戻る"
 
         Lang["btn_Language"] := "言語"
-        Lang["languageNotice"] := "PTCGPB.ahk needs to reload in order to switch the language. Click 'Yes' to reload, or 'No' to return to the settings."
+        Lang["languageNotice"] := "言語切り替えると再起動が必要です。再起動しますか？"
         Lang["btn_reload"] := "リロード"
         Lang["btn_bg_Off"] := "背景オフ"
         Lang["btn_bg_On"] := "背景オン"
