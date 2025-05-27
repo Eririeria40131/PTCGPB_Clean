@@ -4869,7 +4869,7 @@ GetEventRewards(frommain := true){
         CreateStatusMessage("Waiting for Trace`n(" . failSafeTime . "/45 seconds)")
         Delay(1)
     }
-    adbClick_wbb(120, 465)
+    adbClick_wbb(55, 465)
     failSafe := A_TickCount
     failSafeTime := 0
     Loop{
