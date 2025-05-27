@@ -456,7 +456,8 @@
         Lang["Txt_Charizard"] := "Glurak"
         Lang["Txt_Mewtwo"] := "Mewtwo"
         Lang["Txt_Mew"] := "Mew"
-        Lang["AllPack"] := "🔎Show all packs"
+        Lang["AllPack"] := "🔎Zeige alle Packs"
+        Lang["PackHeading"] := "Pack-Auswahl"
 
         Lang["Txt_FullArtCheck"] := "Einzelne Full Art"
         Lang["Txt_TrainerCheck"] := "Einzelne Trainer"
