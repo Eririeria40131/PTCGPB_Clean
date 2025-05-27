@@ -2,9 +2,9 @@
 
 HBitmapToRandomAccessStream(hBitmap) {
     static IID_IRandomAccessStream := "{905A0FE1-BC53-11DF-8C49-001E4FC686DA}"
-        , IID_IPicture            := "{7BF80980-BF32-101A-8BBB-00AA00300CAB}"
-        , PICTYPE_BITMAP := 1
-        , BSOS_DEFAULT   := 0
+          , IID_IPicture            := "{7BF80980-BF32-101A-8BBB-00AA00300CAB}"
+          , PICTYPE_BITMAP := 1
+          , BSOS_DEFAULT   := 0
 
     DllCall("Ole32\CreateStreamOnHGlobal", "Ptr", 0, "UInt", true, "PtrP", pIStream, "UInt")
 
@@ -166,7 +166,7 @@ CreateClass(string, interface, ByRef Class)
 
 CreateHString(string, ByRef hString)
 {
-    DllCall("Combase.dll\WindowsCreateString", "wstr", string, "uint", StrLen(string), "ptr*", hString)
+     DllCall("Combase.dll\WindowsCreateString", "wstr", string, "uint", StrLen(string), "ptr*", hString)
 }
 
 DeleteHString(hString)

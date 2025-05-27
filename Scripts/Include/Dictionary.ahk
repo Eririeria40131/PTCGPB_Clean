@@ -13,7 +13,7 @@
         Lang["installed"] := "Update installed. Restarting..."
         Lang["missing_files"] := "Failed to find the extracted contents."
         Lang["cancel"] := "The update was canceled."
-        Lang["up_to_date"] := "You are running the latest version (" . localVersion . ")."
+        Lang["up_to_date"] := "You are running the latest version (" . localVersion . ")." 
 
         Lang["title_set"] := "You can modify settings here." ; SettingPage
         Lang["btn_reroll"] := "Reroll Settings"
@@ -25,7 +25,7 @@
         Lang["btn_main"] := "Main Page"
 
         Lang["title_main"] := "Arturo's PTCGP BOT" ; MainPage
-        Lang["btn_arrange"] := "Arrange Windows"
+        Lang["btn_arrange"] := "Arrange Windows" 
         Lang["btn_coffee"] := "Buy Me a Coffee"
         Lang["btn_join"] := "Join Discord"
         Lang["btn_mumu"] := "Launch all Mumu"
@@ -36,8 +36,7 @@
         Lang["btn_return"] := "↩️ Return"
 
         Lang["btn_Language"] := "Language"
-        Lang["languageNotice"] :=
-        "PTCGPB.ahk needs to reload in order to switch the language. Click 'Yes' to reload, or 'No' to return to the settings."
+        Lang["languageNotice"] := "PTCGPB.ahk needs to reload in order to switch the language. Click 'Yes' to reload, or 'No' to return to the settings."
         Lang["btn_reload"] := "Reload"
         Lang["btn_bg_Off"] := "Background Off"
         Lang["btn_bg_On"] := "Background On"
@@ -101,7 +100,7 @@
         Lang["Txt_s4tEnabled"] := "Enable Save for Trade"
         Lang["Txt_s4tSilent"] := "Silent (No Ping)"
         Lang["Txt_s4tWP"] := "Wonder Pick"
-        Lang["Txt_s4tWPMinCards"] := "Min. Cards:"
+        Lang["Txt_s4tWPMinCards"] := "Min. Cards:" 
         Lang["S4TDiscordSettingsSubHeading"] := "S4T Discord Settings"
         Lang["Txt_s4tSendAccountXml"] := "Send Account XML"
         Lang["DiscordSettingsHeading"] := "Discord Settings"
@@ -111,7 +110,7 @@
         Lang["hbName"] := "Name:"
         Lang["hbDelay"] := "Heartbeat Delay (min):"
         Lang["Txt_showcaseEnabled"] := "Use Showcase from showcase_ids.txt"
-    } else if (Language = 2) {
+    } else if(Language = 2) {
         Lang["fail_fetch"] := "無法取得發行資訊。" ; checkForUpdate
         Lang["fail_url"] := "無法在發行資訊中找到 ZIP 下載連結。"
         Lang["fail_version"] := "無法取得版本資訊。"
@@ -124,7 +123,7 @@
         Lang["installed"] := "更新安裝完成，正在重新啟動……"
         Lang["missing_files"] := "找不到解壓縮後的內容。"
         Lang["cancel"] := "已取消更新。"
-        Lang["up_to_date"] := "你已使用最新版本 (" . localVersion . ")。"
+        Lang["up_to_date"] := "你已使用最新版本 (" . localVersion . ")。" 
 
         Lang["title_set"] := "在這裡選擇你要修改的設定。" ; SettingPage
         Lang["languageNotice"] := "切換選言需重啟腳本，是否重啟?"
@@ -211,8 +210,8 @@
         Lang["Txt_s4tEnabled"] := "啟用保存交換"
         Lang["Txt_s4tSilent"] := "靜音（不通知）"
         Lang["Txt_s4tWP"] := "得卡挑戰"
-        Lang["Txt_s4tWPMinCards"] := "最少卡數："
-        Lang["S4TDiscordSettingsSubHeading"] := "S4T Discord 設定"
+        Lang["Txt_s4tWPMinCards"] := "最少卡數：" 
+        Lang["S4TDiscordSettingsSubHeading"] := "S4T Discord 設定" 
         Lang["Txt_s4tSendAccountXml"] := "傳送帳號 XML"
         Lang["DiscordSettingsHeading"] := "Discord 設定"
         Lang["Txt_sendAccountXml"] := "傳送帳號 XML"
@@ -246,7 +245,7 @@
         Lang["btn_main"] := "🏠︎ メインページ"
 
         Lang["title_main"] := "Arturo の PTCGP ボット" ; MainPage
-        Lang["btn_arrange"] := "ウィンドウを整列"
+        Lang["btn_arrange"] := "ウィンドウを整列" 
         Lang["btn_coffee"] := "コーヒーを支援"
         Lang["btn_join"] := "Discordに参加"
         Lang["btn_mumu"] := "全てのエミュレータを起動"
@@ -321,8 +320,8 @@
         Lang["Txt_s4tEnabled"] := "交換保存を有効化"
         Lang["Txt_s4tSilent"] := "通知なし（サイレント）"
         Lang["Txt_s4tWP"] := "ゲットチャレンジ"
-        Lang["Txt_s4tWPMinCards"] := "最小枚数："
-        Lang["S4TDiscordSettingsSubHeading"] := "S4T Discord 設定"
+        Lang["Txt_s4tWPMinCards"] := "最小枚数：" 
+        Lang["S4TDiscordSettingsSubHeading"] := "S4T Discord 設定" 
         Lang["Txt_s4tSendAccountXml"] := "アカウント XML 送信"
         Lang["DiscordSettingsHeading"] := "Discord 設定"
         Lang["Txt_sendAccountXml"] := "アカウント XML 送信"
@@ -356,7 +355,7 @@
         Lang["btn_main"] := "Startseite"
 
         Lang["title_main"] := "Arturo's PTCGP BOT"
-        Lang["btn_arrange"] := "Fenster anordnen"
+        Lang["btn_arrange"] := "Fenster anordnen" 
         Lang["btn_coffee"] := "Spendiere mir einen Kaffee"
         Lang["btn_join"] := "Discord beitreten"
         Lang["btn_mumu"] := "Alle Instanzen starten"
@@ -367,8 +366,7 @@
         Lang["btn_return"] := "↩️ Zurück"
 
         Lang["btn_Language"] := "Sprache"
-        Lang["languageNotice"] :=
-        "PTCGPB.ahk needs to reload in order to switch the language. Click 'Yes' to reload, or 'No' to return to the settings."
+        Lang["languageNotice"] := "PTCGPB.ahk needs to reload in order to switch the language. Click 'Yes' to reload, or 'No' to return to the settings."
         Lang["btn_reload"] := "Neu laden"
         Lang["btn_bg_Off"] := "Hintergrund aus"
         Lang["btn_bg_On"] := "Hintergrund an"
@@ -432,7 +430,7 @@
         Lang["Txt_s4tEnabled"] := "Für Tausch speichern aktivieren"
         Lang["Txt_s4tSilent"] := "Still (Kein Ping)"
         Lang["Txt_s4tWP"] := "Wunderwahl"
-        Lang["Txt_s4tWPMinCards"] := "Min. Karten:"
+        Lang["Txt_s4tWPMinCards"] := "Min. Karten:" 
         Lang["S4TDiscordSettingsSubHeading"] := "S4T Discord Einstellungen"
         Lang["Txt_s4tSendAccountXml"] := "Account XML senden"
         Lang["DiscordSettingsHeading"] := "Discord Einstellungen"
@@ -442,7 +440,7 @@
         Lang["hbName"] := "Name:"
         Lang["hbDelay"] := "Herzschlag Verzögerung (min):"
         Lang["Txt_showcaseEnabled"] := "Showcase aus showcase_ids.txt verwenden"
-    }
+    }  
     return Lang
 }
 
@@ -450,30 +448,26 @@ CreateLicenseNoteLanguage(Language) {
     LicenseLang := Object()
     if (Language = 1) {
         LicenseLang["Title"] := "The project is now licensed under CC BY-NC 4.0"
-        LicenseLang["Content"] :=
-        "The original intention of this project was not for it to be used for paid services even those disguised as 'donations.' I hope people respect my wishes and those of the community.`nThe project is now licensed under CC BY-NC 4.0, which allows you to use, modify, and share the software only for non-commercial purposes. Commercial use, including using the software to provide paid services or selling it (even if donations are involved), is not allowed under this license. The new license applies to this and all future releases."
+        LicenseLang["Content"] :=  "The original intention of this project was not for it to be used for paid services even those disguised as 'donations.' I hope people respect my wishes and those of the community.`nThe project is now licensed under CC BY-NC 4.0, which allows you to use, modify, and share the software only for non-commercial purposes. Commercial use, including using the software to provide paid services or selling it (even if donations are involved), is not allowed under this license. The new license applies to this and all future releases."
     } else if (Language = 2) {
         LicenseLang["Title"] := "本專案現已採用 CC BY-NC 4.0 授權"
-        LicenseLang["Content"] :=
-        "本專案的初衷並非用於任何形式的付費服務，即使這些服務以「斗內」的名義包裝也不例外。我希望大家能尊重我與社群的意願。 本授權允許您在非商業用途下使用、修改與分享本軟體。 任何商業用途（包括使用本軟體提供付費服務或銷售，即使是透過斗內方式），在此授權條款下皆不被允許。 新授權條款適用於本版本以及所有未來版本。"
+        LicenseLang["Content"] := "本專案的初衷並非用於任何形式的付費服務，即使這些服務以「斗內」的名義包裝也不例外。我希望大家能尊重我與社群的意願。 本授權允許您在非商業用途下使用、修改與分享本軟體。 任何商業用途（包括使用本軟體提供付費服務或銷售，即使是透過斗內方式），在此授權條款下皆不被允許。 新授權條款適用於本版本以及所有未來版本。"
     } else if (Language = 3) {
         LicenseLang["Title"] := "このプロジェクトは現在、CC BY-NC 4.0 ライセンスの下で提供されています"
-        LicenseLang["Content"] :=
-        "本プロジェクトの本来の意図は、有償サービス（「寄付」と偽装されたものを含む）で使用されることではありません。私およびコミュニティの意志を尊重していただけることを願っています。現在適用されている CC BY-NC 4.0 ライセンスでは、非営利目的に限り、ソフトウェアの使用・改変・共有が可能です。営利目的での利用、たとえば有償サービスの提供や販売（寄付を含む）などは、このライセンスのもとでは許可されていません。この新しいライセンスは、本リリースおよび今後のすべてのリリースに適用されます。"
+        LicenseLang["Content"] := "本プロジェクトの本来の意図は、有償サービス（「寄付」と偽装されたものを含む）で使用されることではありません。私およびコミュニティの意志を尊重していただけることを願っています。現在適用されている CC BY-NC 4.0 ライセンスでは、非営利目的に限り、ソフトウェアの使用・改変・共有が可能です。営利目的での利用、たとえば有償サービスの提供や販売（寄付を含む）などは、このライセンスのもとでは許可されていません。この新しいライセンスは、本リリースおよび今後のすべてのリリースに適用されます。"
     } else if (Language = 4) {
         LicenseLang["Title"] := "Dieses Projekt ist lizensiert unter CC BY-NC 4.0"
-        LicenseLang["Content"] :=
-        "Die ursprüngliche Absicht dieses Projekts war nicht, dass es für bezahlte Dienste genutzt wird – auch nicht in Form angeblicher 'Spenden'. Ich hoffe, dass die Leute meine Wünsche und die der Community respektieren.`nDas Projekt steht nun unter der Lizenz CC BY-NC 4.0. Diese erlaubt die Nutzung, Modifikation und Weitergabe der Software ausschließlich für nicht-kommerzielle Zwecke. Kommerzielle Nutzung – einschließlich bezahlter Dienste oder Verkäufe (auch mit Spenden) – ist unter dieser Lizenz nicht gestattet. Die neue Lizenz gilt für diese und alle zukünftigen Versionen."
+        LicenseLang["Content"] := "Die ursprüngliche Absicht dieses Projekts war nicht, dass es für bezahlte Dienste genutzt wird – auch nicht in Form angeblicher 'Spenden'. Ich hoffe, dass die Leute meine Wünsche und die der Community respektieren.`nDas Projekt steht nun unter der Lizenz CC BY-NC 4.0. Diese erlaubt die Nutzung, Modifikation und Weitergabe der Software ausschließlich für nicht-kommerzielle Zwecke. Kommerzielle Nutzung – einschließlich bezahlter Dienste oder Verkäufe (auch mit Spenden) – ist unter dieser Lizenz nicht gestattet. Die neue Lizenz gilt für diese und alle zukünftigen Versionen."
     }
     return LicenseLang
 }
 
 CreateProxyLanguage(Language) {
-    ProxyLang := Object()
+        ProxyLang := Object()
     if (Language = 1) {
-        ProxyLang["Notice"] := "Proxy detected. Switched to proxy version."
+        ProxyLang["Notice"] := "Proxy detected. Switched to proxy version." 
     } else if (Language = 2) {
-        ProxyLang["Notice"] := "偵測到代理，已切換至代理版本。"
+        ProxyLang["Notice"] := "偵測到代理，已切換至代理版本。" 
     } else if (Language = 3) {
         ProxyLang["Notice"] := "プロキシを検出しました。プロキシ版に切り替えました。"
     } else if (Language = 4) {
@@ -485,8 +479,7 @@ CreateProxyLanguage(Language) {
 CreateSetUpByLanguage(Language) {
     SetUpLang := Object()
     if (Language = 1) {
-        SetUpLang["Error_BotPathTooLong"] :=
-        "The path to the bot folder is too long or contains white spaces. Please move it to a shorter path without spaces."
+        SetUpLang["Error_BotPathTooLong"] := "The path to the bot folder is too long or contains white spaces. Please move it to a shorter path without spaces."
         SetUpLang["Confirm_SelectedMethod"] := "Selected Method: "
         SetUpLang["Confirm_RangeValue"] := "Range Value: "
         SetUpLang["Confirm_MaxPackCount"] := "Maximum Pack Count: "
@@ -510,8 +503,7 @@ CreateSetUpByLanguage(Language) {
         SetUpLang["Confirm_OnlyShinyPacks"] := "• Only Shiny Packs"
         SetUpLang["Confirm_IgnoreInvalid"] := "• Ignore Invalid Packs"
         SetUpLang["Confirm_RowGap"] := "Row Gap: "
-        SetUpLang["Confirm_StartBot"] :=
-        "Click 'Yes' to START THE BOT with these settings. Click 'No' to CHANGE settings."
+        SetUpLang["Confirm_StartBot"] := "Click 'Yes' to START THE BOT with these settings. Click 'No' to CHANGE settings."
     } else if (Language = 2) {
         SetUpLang["Error_BotPathTooLong"] := "機器人資料夾的路徑太長或包含空白，請將其移至較短且不含空白的路徑"
         SetUpLang["Confirm_SelectedMethod"] := "刷包法："
@@ -565,8 +557,7 @@ CreateSetUpByLanguage(Language) {
         SetUpLang["Confirm_RowGap"] := "行間隔："
         SetUpLang["Confirm_StartBot"] := "「はい」でこの設定でBOTを開始。「いいえ」で設定を変更します。"
     } else if (Language = 4) {
-        SetUpLang["Error_BotPathTooLong"] :=
-        "Der Pfad zum Bot-Ordner ist zu lang oder enthält Leerzeichen. Bitte verschiebe ihn in ein kürzeres Verzeichnis ohne Leerzeichen."
+        SetUpLang["Error_BotPathTooLong"] := "Der Pfad zum Bot-Ordner ist zu lang oder enthält Leerzeichen. Bitte verschiebe ihn in ein kürzeres Verzeichnis ohne Leerzeichen."
         SetUpLang["Confirm_SelectedMethod"] := "Gewählte Methode: "
         SetUpLang["Confirm_RangeValue"] := "Wertbereich: "
         SetUpLang["Confirm_MaxPackCount"] := "Maximale Paketanzahl: "
@@ -590,8 +581,7 @@ CreateSetUpByLanguage(Language) {
         SetUpLang["Confirm_OnlyShinyPacks"] := "• Nur schillernde Packs"
         SetUpLang["Confirm_IgnoreInvalid"] := "• Ignoriere ungültige Packs"
         SetUpLang["Confirm_RowGap"] := "Abstand zw. Instanzen: "
-        SetUpLang["Confirm_StartBot"] :=
-        "Klicke auf „Ja“, um den BOT mit diesen Einstellungen zu STARTEN. Klicke auf „Nein“, um die Einstellungen zu ÄNDERN."
+        SetUpLang["Confirm_StartBot"] := "Klicke auf „Ja“, um den BOT mit diesen Einstellungen zu STARTEN. Klicke auf „Nein“, um die Einstellungen zu ÄNDERN."
     }
     return SetUPLang
 }
@@ -658,28 +648,28 @@ PageBtnShift(Language) {
     xs_Trade := 0
     xs_Discord := 0
     xs_Download := 0
-    xs_MainPage := 0
+    xs_MainPage := 0    
     ys := 0
 
     xs_Arrange := 0
     xs_Coffee := 0
-    xs_Join := 0
-    xs_Launch := 0
-    xs_Balance := 0
-    xs_Start := 0
+    xs_Join := 0    
+    xs_Launch := 0    
+    xs_Balance := 0    
+    xs_Start := 0    
     xs_Update := 0
     xs_SettingPage := 0
     ys_SettingPage := 0
 
     xs_Return := 0
-    ys_Return := 0
+    ys_Return := 0   
 
     xs_Background := 0
     xs_Reload := 0
     xs_Theme := 0
     xs_Language := 0
-    ys_Background := 0
-    ys_Theme := 0
+    ys_Background := 0    
+    ys_Theme := 0    
     ys_Reload := 0
     ys_Language := 0
     if (defaultBotLanguage = 1) {
@@ -690,27 +680,27 @@ PageBtnShift(Language) {
         xs_Trade := 0
         xs_Discord := 0
         xs_Download := 0
-        xs_MainPage := 0
+        xs_MainPage := 0    
         ys := 0
 
         xs_Arrange := 0
         xs_Coffee := 0
-        xs_Join := 0
-        xs_Launch := 0
-        xs_Balance := 0
-        xs_Start := 0
+        xs_Join := 0    
+        xs_Launch := 0    
+        xs_Balance := 0    
+        xs_Start := 0    
         xs_Update := 0
         xs_SettingPage := 0
         ys_SettingPage := 0
 
         xs_Return := 0
-        ys_Return := 0
-
+        ys_Return := 0   
+        
         xs_Background := 0
         xs_Reload := 0
         xs_Theme := 0
-        ys_Background := 0
-        ys_Theme := 0
+        ys_Background := 0    
+        ys_Theme := 0    
         ys_Reload := 0
     } else if (defaultBotLanguage = 2) {
         xs_TitleSet := 10
@@ -735,7 +725,7 @@ PageBtnShift(Language) {
 
         xs_Return := 26
         ys_Return := 4
-
+    
         xs_Background := 20
         xs_Reload := 20
         xs_Theme := 0
@@ -767,7 +757,7 @@ PageBtnShift(Language) {
 
         xs_Return := 26
         ys_Return := 4
-
+    
         xs_Background := -2
         xs_Reload := -12
         xs_Theme := -37
@@ -783,27 +773,27 @@ PageBtnShift(Language) {
         xs_Trade := -15
         xs_Discord := -15
         xs_Download := -15
-        xs_MainPage := 4
+        xs_MainPage := 4    
         ys := 0
 
         xs_Arrange := 0
         xs_Coffee := -40
-        xs_Join := -20
-        xs_Launch := -15
-        xs_Balance := -15
-        xs_Start := -5
+        xs_Join := -20   
+        xs_Launch := -15    
+        xs_Balance := -15    
+        xs_Start := -5    
         xs_Update := -20
         xs_SettingPage := 0
         ys_SettingPage := 0
 
         xs_Return := 0
-        ys_Return := 0
+        ys_Return := 0   
 
         xs_Background := 2
         xs_Reload := -10
         xs_Theme := 0
-        ys_Background := 0
-        ys_Theme := 0
+        ys_Background := 0   
+        ys_Theme := 0    
         ys_Reload := 0
     }
 }

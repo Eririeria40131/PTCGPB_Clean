@@ -13,7 +13,7 @@ if (!FileExist(saveDir)) {
     ; Try alternative path directly
     saveDir := scriptDir . "\Accounts\Saved"
     saveDir := StrReplace(saveDir, "\\", "\")
-
+    
     ; Exit immediately if neither path exists
     if (!FileExist(saveDir)) {
         ExitApp
