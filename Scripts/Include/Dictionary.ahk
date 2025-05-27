@@ -36,6 +36,7 @@
         Lang["btn_setting"] := "Settings Page"
         Lang["btn_return"] := "↩️ Return"
 
+        Lang["btn_ToolTip"] := "ToolTip"
         Lang["btn_Language"] := "Language"
         Lang["languageNotice"] := "PTCGPB.ahk needs to reload in order to switch the language. "
         Lang["languageNotice"] .= "Click 'Yes' to reload, or 'No' to return to the settings."
@@ -138,7 +139,6 @@
         Lang["up_to_date"] := "你已使用最新版本 (" . localVersion . ")。"
 
         Lang["title_set"] := "在這裡選擇你要修改的設定。" ; SettingPage
-        Lang["languageNotice"] := "切換選言需重啟腳本，是否重啟?"
         Lang["btn_reroll"] := "刷包設定"
         Lang["btn_system"] := "系統設定"
         Lang["btn_pack"] := "卡包設定"
@@ -158,7 +158,9 @@
         Lang["btn_setting"] := "⚙️ 設定頁面"
         Lang["btn_return"] := "↩️ 返回"
 
+        Lang["btn_ToolTip"] := "使用說明"
         Lang["btn_Language"] := "語言"
+        Lang["languageNotice"] := "切換選言需重啟腳本，是否重啟?"
         Lang["btn_reload"] := "重啟"
         Lang["btn_bg_Off"] := "背景關閉"
         Lang["btn_bg_On"] := "背景開啟"
@@ -277,6 +279,7 @@
         Lang["btn_setting"] := "⚙️ 設定ページ"
         Lang["btn_return"] := "↩️ 戻る"
 
+        Lang["btn_ToolTip"] := "ヒント"
         Lang["btn_Language"] := "言語"
         Lang["languageNotice"] := "言語切り替えると再起動が必要です。再起動しますか？"
         Lang["btn_reload"] := "リロード"
@@ -398,6 +401,7 @@
         Lang["btn_return"] := "↩️ Zurück"
         Lang["PackHeading"] := "Pack Selection"
 
+        Lang["btn_ToolTip"] := "QuickInfo"
         Lang["btn_Language"] := "Sprache"
         Lang["languageNotice"] := "PTCGPB.ahk muss neu geladen werden, um die Sprache zu wechseln. "
         Lang["languageNotice"] .= "Klicke auf ‚Ja‘ zum Neuladen oder auf ‚Nein‘, "
@@ -743,10 +747,12 @@ PageBtnShift(Language) {
     xs_Reload := 0
     xs_Theme := 0
     xs_Language := 0
+    xs_ToolTip := 0
     ys_Background := 0
     ys_Theme := 0
     ys_Reload := 0
     ys_Language := 0
+    ys_ToolTip := 0
     if (defaultBotLanguage = 1) {
         xs_TitleSet := 10
         xs_Reroll := 0
@@ -771,9 +777,11 @@ PageBtnShift(Language) {
         xs_Return := 0
         ys_Return := 0
 
-        xs_Background := 0
-        xs_Reload := 0
+        xs_Background := -3
+        xs_Reload := -6
         xs_Theme := 0
+        xs_Language := -8
+        xs_ToolTip := -11
         ys_Background := 0
         ys_Theme := 0
         ys_Reload := 0
@@ -801,14 +809,16 @@ PageBtnShift(Language) {
         xs_Return := 16
         ys_Return := 4
 
-        xs_Background := 20
-        xs_Reload := 20
+        xs_Background := 13
+        xs_Reload := 6
         xs_Theme := 0
-        xs_Language := 40
+        xs_Language := 19
+        xs_ToolTip := -11
         ys_Background := 1
         ys_Theme := 1
         ys_Reload := 1
         ys_Language := 1
+        ys_ToolTip := 1
     } else if (defaultBotLanguage = 3) {
         xs_TitleSet := 10
         xs_Reroll := 11
@@ -833,10 +843,11 @@ PageBtnShift(Language) {
         xs_Return := 26
         ys_Return := 4
 
-        xs_Background := -2
-        xs_Reload := -12
+        xs_Background := -9
+        xs_Reload := -26
         xs_Theme := -37
-        xs_Language := 18
+        xs_Language := -4
+        xs_ToolTip := -11
         ys_Background := 0
         ys_Theme := 0
         ys_Reload := 0
@@ -867,6 +878,7 @@ PageBtnShift(Language) {
         xs_Background := 2
         xs_Reload := -10
         xs_Theme := 0
+        xs_ToolTip := -11
         ys_Background := 0
         ys_Theme := 0
         ys_Reload := 0
