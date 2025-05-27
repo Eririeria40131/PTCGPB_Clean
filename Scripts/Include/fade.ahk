@@ -11,7 +11,7 @@ Gui, Mask:+ToolWindow -Caption +AlwaysOnTop +E0x80000 +LastFound
 Gui, Mask:Color, 2d2d2d
 WinSet, Transparent, 0
 WinSet, ExStyle, +0x20
-Gui, Mask:Show, w380 h705 x%x% y%y% NoActivate 
+Gui, Mask:Show, w380 h705 x%x% y%y% NoActivate
 FileDelete, %goSignalFile%   ; delete signal
 
 ; ===== Fade In =====
@@ -49,5 +49,5 @@ Gui, Mask:Destroy
 ExitApp
 
 CleanupAndExit:
-Gui, Mask:Destroy
+    Gui, Mask:Destroy
 ExitApp
