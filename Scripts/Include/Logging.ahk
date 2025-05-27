@@ -26,15 +26,15 @@ CreateStatusMessage(Message, GuiName := "StatusMessage", X := 0, Y := 565, debug
     if (Debug && Message != DEFAULT_STATUS_MESSAGE)
         LogToFile(GuiName . ": " . Message)
 
-	if(GuiName = "AvgRuns")
-		guiheight := 20
-	else
-		guiheight := 40
-		
+    if(GuiName = "AvgRuns")
+        guiheight := 20
+    else
+        guiheight := 40
+
     try {
         ; Check if GUI with this name already exists.
         GuiName := GuiName . scriptName
-		
+
         if !hwnds.HasKey(GuiName) {
             WinGetPos, xpos, ypos, Width, Height, %winTitle%
             X := X + xpos + 5
@@ -130,7 +130,7 @@ LogToDiscord(message, screenshotFile := "", ping := false, xmlFile := "", screen
         RegRead, proxyEnabled, HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Internet Settings, ProxyEnable
         RegRead, proxyServer, HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Internet Settings, ProxyServer
         if (proxyEnabled) {
-            curlChar := "curl -k -x " . proxyServer . "/ " 
+            curlChar := "curl -k -x " . proxyServer . "/ "
         } else {
             curlChar := "curl -k "
         }
