@@ -325,7 +325,7 @@
 
         Lang["Txt_Solgaleo"] := "ソルガレオ"
         Lang["Txt_Lunala"] := "ルナアーラ"
-        Lang["Txt_Shining"] := "シャイハイ"
+        Lang["Txt_Shining"] := "シャイニングハイ"
         Lang["Txt_Arceus"] := "アルセウス"
         Lang["Txt_Palkia"] := "パルキア"
         Lang["Txt_Dialga"] := "ディアルガ"
@@ -333,8 +333,8 @@
         Lang["Txt_Charizard"] := "リザードン"
         Lang["Txt_Mewtwo"] := "ミュウツー"
         Lang["Txt_Mew"] := "ミュウ"
-        Lang["AllPack"] := "🔎全てのパックを表示"
-        Lang["PackHeading"] := "パック選択"
+        Lang["AllPack"] := "🔎パックを表示"
+        Lang["PackHeading"] := "パックを選択"
 
         Lang["Txt_FullArtCheck"] := "単枚フルアート"
         Lang["Txt_TrainerCheck"] := "単枚トレーナー"
@@ -880,14 +880,11 @@ PackControlsShift(Language) {
     xs_Hourglass := 0
     xs_SpecialCheck := 0
     xs_Sort := 0
-    xs_ShowAllPack := 0
     xs_SaveCrown := 0
     xs_SaveShing := 0
     xs_SaveImmer := 0
     xs_invalid := 0
-    if (defaultBotLanguage = 3) {
-        xs_ShowAllPack := -35
-    } else if (defaultBotLanguage = 4) {
+    if (defaultBotLanguage = 4) {
         xs_Min2star := -10
         xs_MinShing := -20
         xs_SpecialCheck := 20
