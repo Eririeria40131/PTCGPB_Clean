@@ -84,6 +84,7 @@
         Lang["Txt_claimSpecialMissions"] := "Claim Special Missions"
         Lang["SortByText"] := "Sort By:"
 
+        Lang["Txt_Buzzwole"] := "Buzzwole"
         Lang["Txt_Solgaleo"] := "Solgaleo"
         Lang["Txt_Lunala"] := "Lunala"
         Lang["Txt_Shining"] := "Shining"
@@ -205,6 +206,7 @@
         Lang["Txt_claimSpecialMissions"] := "領取特殊任務"
         Lang["SortByText"] := "注入排序："
 
+        Lang["Txt_Buzzwole"] := "爆肌蚊"
         Lang["Txt_Solgaleo"] := "索爾迦雷歐"
         Lang["Txt_Lunala"] := "露奈雅拉"
         Lang["Txt_Shining"] := "嗨放異彩"
@@ -326,6 +328,7 @@
         Lang["Txt_claimSpecialMissions"] := "イベント"
         Lang["SortByText"] := "注入序列："
 
+        Lang["Txt_Buzzwole"] := "マッシブーン"
         Lang["Txt_Solgaleo"] := "ソルガレオ"
         Lang["Txt_Lunala"] := "ルナアーラ"
         Lang["Txt_Shining"] := "シャイニングハイ"
@@ -450,6 +453,7 @@
         Lang["Txt_claimSpecialMissions"] := "Spezialmissionen"
         Lang["SortByText"] := "Sortieren nach:"
 
+        Lang["Txt_Buzzwole"] := "Masskito"
         Lang["Txt_Solgaleo"] := "Solgaleo"
         Lang["Txt_Lunala"] := "Lunala"
         Lang["Txt_Shining"] := "Schillernd"
@@ -809,8 +813,8 @@ PageBtnShift(Language) {
         xs_Return := 16
         ys_Return := 4
 
-        xs_Background := 13
-        xs_Reload := 6
+        xs_Background := 18
+        xs_Reload := 9
         xs_Theme := 0
         xs_Language := 19
         xs_ToolTip := -11
