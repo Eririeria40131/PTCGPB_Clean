@@ -1,5 +1,5 @@
 📌 **Based on:** [Arturo's PTCGPB](https://github.com/Arturo-1212/PTCGPB)
-
+## 📢 The project has been merged into the official project!
 # **GUI Improvements**
 
 - Modified the original GUI style  
